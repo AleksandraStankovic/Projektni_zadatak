@@ -17,6 +17,9 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private int rows; //ovo mozda i nece trebati ovdje, tj vjerovatno nece trebati, al neka ga za sad. , lako cemo obrisati I guess
 	private int cols;
+	
+	//idk ovo kasnije obrisati ovo za rows i cols, vjerovatno nece trebati 
+	
 	// atributi, koji će ustvari biti elementi koji će se ovjde koristiti.
 	private JComboBox<String> cbPolaziste;// combo boxovi za izbor odredista i polazista i kriterijuma
 	private JComboBox<String> cbOdrediste;

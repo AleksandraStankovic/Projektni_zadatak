@@ -4,8 +4,7 @@ package util;
 import model.Racun;
 import java.io.*;
 import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+
 //neki dijelovi ovdje su definitivno okej i nece biti potrebe za puno promjena, bar u ovom dijelu. 
 
 public class RacunUtil {

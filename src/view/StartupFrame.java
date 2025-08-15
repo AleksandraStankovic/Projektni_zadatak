@@ -93,7 +93,7 @@ public class StartupFrame extends JFrame {
 
 		startButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {//idk, ovdje negdje jos dodati to da pritiskom na enter se aktivira ovo dugme
 				 try {
 					 int rows = Integer.parseInt(rowsField.getText());
 	                    int cols = Integer.parseInt(colsField.getText());

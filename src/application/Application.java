@@ -12,3 +12,7 @@ package application;
 //         startupFrame.setVisible(true);
 //    }
 //}
+
+
+//idk ovdje cemo dodati jos nekih komenatar
+//ova klasa nam kasnije i nece trebati
