@@ -1,6 +1,3 @@
-/application/
 /generator/
-/graph/
-/model/
-/util/
 /view/
+/controller/

@@ -12,83 +12,108 @@ import javax.swing.BorderFactory;
 
 import java.awt.*;
 
+import generator.TransportDataGenerator;
+
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private int rows; //ovo mozda i nece trebati ovdje, tj vjerovatno nece trebati, al neka ga za sad. , lako cemo obrisati I guess
-	private int cols;
-	
-	//idk ovo kasnije obrisati ovo za rows i cols, vjerovatno nece trebati 
-	
-	// atributi, koji će ustvari biti elementi koji će se ovjde koristiti.
-	private JComboBox<String> cbPolaziste;// combo boxovi za izbor odredista i polazista i kriterijuma
+
+	private JComboBox<String> cbPolaziste;
 	private JComboBox<String> cbOdrediste;
 	private JComboBox<String> cbKriterijum;
 	private JLabel lblUkupno;
 	private JTable table;
 
-	public MainFrame(int rows, int cols) {// konstruktor. Uzima vrijednosti rowa i columns od prvog prozora
-		// ovdje sada definisemo sta se desava prilikom pokretanja prozora i definisemo
-		// prikazivanje elemenata na njemu
-		this.rows = rows;
-		this.cols = cols;
+	private TransportDataGenerator.TransportData transportData;// u ovoj klasi sada imamo objekat koji ima u sebi
+																// sacuvane sve podatke o transportu
 
-		// samo za testiranje, kasnije cemo ove vrijednosti da proslijedimo za
-		// generisanje grafa i generisanje stanica
+	/// ovo nam mece trebati ovo je samo za testiranje da li podaci dobro parsiraju
+	private void printParsedData() {
+		if (transportData == null) {
+			System.out.println("No transport data loaded!");
+			return;
+		}
 
-		System.out.println("rows:" + rows);
-		System.out.println("cols:" + cols);
+		System.out.println("=== Stations ===");
+		for (TransportDataGenerator.Station s : transportData.stations) {
+			System.out.println("City: " + s.city + ", Bus: " + s.busStation + ", Train: " + s.trainStation);
+		}
+
+		System.out.println("\n=== Departures ===");
+		for (TransportDataGenerator.Departure d : transportData.departures) {
+			System.out.println(d.type + " | From: " + d.from + " | To: " + d.to + " | Time: " + d.departureTime
+					+ " | Duration: " + d.duration + " | Price: " + d.price + " | MinTransfer: " + d.minTransferTime);
+		}
+
+		System.out.println("\n=== Country Map ===");
+		for (int i = 0; i < transportData.countryMap.length; i++) {
+			for (int j = 0; j < transportData.countryMap[i].length; j++) {
+				System.out.print(transportData.countryMap[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+
+	private void initializeComboBoxes() {
+		if (transportData == null || transportData.countryMap == null)
+			return;
+
+		int rows = transportData.countryMap.length;
+		int cols = transportData.countryMap[0].length;
+		String[] cities = new String[rows * cols];
+		int index = 0;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				cities[index++] = transportData.countryMap[i][j];
+			}
+		}
+
+		cbPolaziste = new JComboBox<>();
+		cbOdrediste = new JComboBox<>();
+
+		cbPolaziste.setModel(new javax.swing.DefaultComboBoxModel<>(cities));
+		cbOdrediste.setModel(new javax.swing.DefaultComboBoxModel<>(cities));
+
+		cbOdrediste.setPreferredSize(new Dimension(150, cbOdrediste.getPreferredSize().height));
+		cbPolaziste.setPreferredSize(new Dimension(150, cbPolaziste.getPreferredSize().height));
+
+		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
+		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
+	}
+
+	public MainFrame(TransportDataGenerator.TransportData data) {
+
+		this.transportData = data;
+		printParsedData();
 
 		setSize(900, 700);
 		setTitle("Pronalazak rute");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		// setLayout(new BorderLayout());
 
-		// Create the main panel with BorderLayout //Main Panel u koji ce da ide sve
-		// ostalo
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		// mainPanel.add(topPanel);//kreiramo top panel sa statistikom i dodamo ga u
-		// main panel
-
-		// centralni panel sa grafom i tabelom
 		JPanel centerPanel = new JPanel(new BorderLayout());
 
 		// Panel sa combo boxovima.
-		cbPolaziste = new JComboBox<>(new String[] { "A_0_0", "B_0_1", "C_1_0" }); // ovdje ce kasnije ici drugaciji
-																					// prikaz tj ici ce mozda neka druga
-																					// metoda koja dodaje parsirane
-																					// elemente
-		cbPolaziste.setPreferredSize(new Dimension(150, cbPolaziste.getPreferredSize().height));
-		cbOdrediste = new JComboBox<>(new String[] { "A_0_0", "B_0_1", "C_1_0" }); // moze poziv neke metode.
-		cbOdrediste.setPreferredSize(new Dimension(150, cbOdrediste.getPreferredSize().height));
-		// Trebalo bi da kad se izabere polaziste, da se ono izbrise iz liste odredista,
-		// jer nema smisla da se trazi da se ide iz istog u isti grad
-		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
-		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
 
-		// dodajemo dugmice za sta nam vec trebaju
+		initializeComboBoxes(); // trebace se mijenjati
+
 		JButton btnPronadji = new JButton("Pronađi rutu");
 		JButton btnDodatneRute = new JButton("Prikaži dodatne rute");// ostali dugmići koji nam trebaju
 		JButton btnKupi = new JButton("Kupovina karte");
 
-		// gore smo definisali dugmice i ostalo, ovdje sada sve dodamo u ovaj panel top
-		// form panel
 		JPanel topFormPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topFormPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0), // Bottom
 																													// padding
 																													// of
 																													// 20px
-				topFormPanel.getBorder() // Keep any existing border
-		));
+				topFormPanel.getBorder()));
 
-		// ovako je napravljeno tako da imamo custom spacing izmedju komponetni, kasnije
-		// moze jos da se popravi i guess...
 		topFormPanel.add(new JLabel("Polazište:"));
 		topFormPanel.add(cbPolaziste);
-		topFormPanel.add(Box.createHorizontalStrut(20)); // 20px space
+		topFormPanel.add(Box.createHorizontalStrut(20));
 
 		topFormPanel.add(new JLabel("Odredište:"));
 		topFormPanel.add(cbOdrediste);
@@ -103,7 +128,8 @@ public class MainFrame extends JFrame {
 		// sada pravimo tabelu
 		String[] kolone = { "Polazak", "Dolazak", "Tip", "Cijena" };// mozda ce trebati jos kolona ako se bude gledalo i
 																	// vrijeme
-		//bice potrebno dodati i vremena, kao i mehanizam za brojanje vremena i brojanje trajanja
+		// bice potrebno dodati i vremena, kao i mehanizam za brojanje vremena i
+		// brojanje trajanja
 
 		// Replace your current table data with this expanded version
 		Object[][] podaci = { { "Sarajevo", "Mostar", "Autobus", "20 KM" }, { "Mostar", "Sarajevo", "Voz", "25 KM" },
@@ -118,15 +144,6 @@ public class MainFrame extends JFrame {
 				{ "Tuzla", "Osijek", "Voz", "30 KM" }, { "Zenica", "Sarajevo", "Autobus", "10 KM" } };// dummy podaci,
 																										// kasnije cemo
 																										// ucitati prave
-																										// trebace
-																										// mijenjati i
-																										// kolone
-																										// treba isto
-																										// tako da pise
-																										// koliko je
-																										// ukupno cijena
-																										// i ukupno
-																										// trajanje
 																										// ppodatke
 		table = new JTable(podaci, kolone);
 		table.setBackground(new Color(240, 248, 255));
@@ -143,36 +160,29 @@ public class MainFrame extends JFrame {
 			frame.setVisible(true);
 		});
 
-		JScrollPane tableScroll = new JScrollPane(table);// dodamo novi scroll panel sa tabelom
-		tableScroll.setPreferredSize(new Dimension(0, 200)); // Fixed height for table
-
-		// centralni panel je za tabelu i za graf
+		JScrollPane tableScroll = new JScrollPane(table);
+		tableScroll.setPreferredSize(new Dimension(0, 200));
 
 		JPanel tablePanel = new JPanel(new BorderLayout());
 		tablePanel.add(tableScroll, BorderLayout.CENTER);
-
-		// dodavanje lbla za ukupnp
 
 		lblUkupno = new JLabel(" Ukupno: 2h 30min | 550 N.J");
 		lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f)); // kasnije ćemo da mijenjamo.
 
 		// container za dodavanje paddinga oko labela
 		JPanel labelContainer = new JPanel(new BorderLayout());
-		labelContainer.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0)); // Top, left, bottom, right padding
+		labelContainer.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 		labelContainer.add(lblUkupno, BorderLayout.CENTER);
 
-		// Add to the table panel
 		tablePanel.add(labelContainer, BorderLayout.SOUTH);
 
-		centerPanel.add(tablePanel, BorderLayout.NORTH);// u centralni panel dodamo onda ovaj scroll panel
+		centerPanel.add(tablePanel, BorderLayout.NORTH);
 
 		// kreiramo graf
-		// Graph panel - will stretch to fill remaining space
 		GraphPanel graphPanel = new GraphPanel();
 		graphPanel.setBackground(Color.WHITE);
-		centerPanel.add(graphPanel, BorderLayout.CENTER);// u centralni panel onda dodamo ovaj graph panel
+		centerPanel.add(graphPanel, BorderLayout.CENTER);
 
-//bottom panel sa dva dugmeta
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 200, 10));
 		bottomPanel.add(btnDodatneRute);
 		bottomPanel.add(btnKupi);
