@@ -57,13 +57,12 @@ public class StartupFrame extends JFrame {
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 		JButton startButton = new JButton("Kreiraj matricu");
 
-		// dodavanje lbl i polja za unos
 		inputPanel.add(new JLabel("Broj redova:"));
 		rowsField = new JTextField("");
 		inputPanel.add(rowsField);
 
 		inputPanel.add(new JLabel("Broj kolona:"));
-		colsField = new JTextField("");// ovdje ce terbati biti unos a ne ovako definisano
+		colsField = new JTextField("");
 		inputPanel.add(colsField);
 
 		rowsField.addActionListener(e -> startButton.doClick());
@@ -72,19 +71,16 @@ public class StartupFrame extends JFrame {
 
 		startButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {// idk, ovdje negdje jos dodati to da pritiskom na enter se
-														// aktivira ovo dugme
+			public void actionPerformed(ActionEvent e) {
+														
 				try {
 					int rows = Integer.parseInt(rowsField.getText());
 					int cols = Integer.parseInt(colsField.getText());
 
-					// Set dimensions in TransportDataGenerator
 					TransportDataGenerator.setDimensions(rows, cols);
 
-					// Generate and save the data
 					TransportDataGenerator.generateAndSaveData();
 
-					// parse data from json
 					TransportDataGenerator.TransportData data = TransportDataParser.parse("transport_data.json");
 
 					dispose();

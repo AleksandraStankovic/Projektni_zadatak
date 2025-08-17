@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import java.awt.*;
 
 import generator.TransportDataGenerator;
+import controller.RouteController;
 
 public class MainFrame extends JFrame {
 
@@ -24,81 +25,33 @@ public class MainFrame extends JFrame {
 	private JLabel lblUkupno;
 	private JTable table;
 
-	private TransportDataGenerator.TransportData transportData;// u ovoj klasi sada imamo objekat koji ima u sebi
-																// sacuvane sve podatke o transportu
+	private RouteController controller;
 
-	/// ovo nam mece trebati ovo je samo za testiranje da li podaci dobro parsiraju
-	private void printParsedData() {
-		if (transportData == null) {
-			System.out.println("No transport data loaded!");
-			return;
-		}
-
-		System.out.println("=== Stations ===");
-		for (TransportDataGenerator.Station s : transportData.stations) {
-			System.out.println("City: " + s.city + ", Bus: " + s.busStation + ", Train: " + s.trainStation);
-		}
-
-		System.out.println("\n=== Departures ===");
-		for (TransportDataGenerator.Departure d : transportData.departures) {
-			System.out.println(d.type + " | From: " + d.from + " | To: " + d.to + " | Time: " + d.departureTime
-					+ " | Duration: " + d.duration + " | Price: " + d.price + " | MinTransfer: " + d.minTransferTime);
-		}
-
-		System.out.println("\n=== Country Map ===");
-		for (int i = 0; i < transportData.countryMap.length; i++) {
-			for (int j = 0; j < transportData.countryMap[i].length; j++) {
-				System.out.print(transportData.countryMap[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-
-	private void initializeComboBoxes() {
-		if (transportData == null || transportData.countryMap == null)
-			return;
-
-		int rows = transportData.countryMap.length;
-		int cols = transportData.countryMap[0].length;
-		String[] cities = new String[rows * cols];
-		int index = 0;
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				cities[index++] = transportData.countryMap[i][j];
-			}
-		}
-
-		cbPolaziste = new JComboBox<>();
-		cbOdrediste = new JComboBox<>();
-
-		cbPolaziste.setModel(new javax.swing.DefaultComboBoxModel<>(cities));
-		cbOdrediste.setModel(new javax.swing.DefaultComboBoxModel<>(cities));
-
-		cbOdrediste.setPreferredSize(new Dimension(150, cbOdrediste.getPreferredSize().height));
-		cbPolaziste.setPreferredSize(new Dimension(150, cbPolaziste.getPreferredSize().height));
-
-		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
-		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
-	}
-
-	public MainFrame(TransportDataGenerator.TransportData data) {
-
-		this.transportData = data;
-		printParsedData();
+	public MainFrame(TransportDataGenerator.TransportData data) { // dakle, u ovo proslijedimo data, koji onda moramo da
+																	// proslijedimo u controller
 
 		setSize(900, 700);
 		setTitle("Pronalazak rute");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 
+		controller = new RouteController(data);
+
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JPanel centerPanel = new JPanel(new BorderLayout());
 
-		// Panel sa combo boxovima.
+		cbPolaziste = new JComboBox<>();
+		cbOdrediste = new JComboBox<>();
 
-		initializeComboBoxes(); // trebace se mijenjati
+		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
+		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
+
+		controller.initializeComboBoxes(cbPolaziste, cbOdrediste); // trebace se mijenjati
+
+		cbOdrediste.addActionListener(e -> controller.updateStartComboBox(cbPolaziste, cbOdrediste));
+		cbPolaziste.addActionListener(e -> controller.updateEndComboBox(cbPolaziste, cbOdrediste));
 
 		JButton btnPronadji = new JButton("Pronađi rutu");
 		JButton btnDodatneRute = new JButton("Prikaži dodatne rute");// ostali dugmići koji nam trebaju
