@@ -6,6 +6,9 @@ import javax.swing.JComboBox;
 
 //kontroleer koji ce da kontrolise svu logiku vezanu za rute, da nije u gui i u main frame klasi
 
+/**
+ * 
+ */
 public class RouteController {
 
 	private TransportDataGenerator.TransportData transportData;// podaci koji ce se koristiti
@@ -37,15 +40,18 @@ public class RouteController {
 		}
 	}
 
-	public RouteController(TransportDataGenerator.TransportData transportData)// uzimace ove podatke tj u ovu metodu se
-																				// prosledjuju podaci
+	public RouteController(TransportDataGenerator.TransportData transportData)
+																				
 	{
 		this.transportData = transportData;
 		printParsedData();// ovdje imamo ovo za testiranje
 	}
 
-	// metoda koju smo i ranije imali za init combo boxova, samo ovdje prvo uzemmo
-	// sve gradove i pretvorimo u 1d niz potreban combo boxovima
+
+	/**
+	 * 
+	 * @return List of all cities
+	 */
 	public String[] getAllCities() {
 		if (transportData == null || transportData.countryMap == null)
 			return new String[0];
@@ -62,8 +68,12 @@ public class RouteController {
 		return cities;
 	}
 
-	// inicijazivovanje cBoxova - uzmu tj proslijede se cb kao parametrei ove metode
+	
 
+	/**Initializes origin and departure combo boxes with list of cities	 
+	 * @param cbPolaziste Combo box with list of possible origin cities
+	 * @param cbOdrediste Combo box with list of possible destination cities
+	 */
 	public void initializeComboBoxes(JComboBox<String> cbPolaziste, JComboBox<String> cbOdrediste) {
 		String[] cities = getAllCities();
 		cbPolaziste.setModel(new DefaultComboBoxModel<>(cities));
@@ -85,11 +95,11 @@ public class RouteController {
 	}
 
 	/**
-	 * Removes city selected in Polaziste Combo Box from Odrediste Combo Box
+	 * Removes city selected in Polaziste Combo box from Odrediste Combo Box
 	 * preventing user from choosing same city as both origin and destination.
 	 * 
-	 * @param cbPolaziste Starting Combo Box
-	 * @param cbOdrediste End Combo Box
+	 * @param cbPolaziste Combo box with list of possible origin cities
+	 * @param cbOdrediste Combo box with list of possible destination cities
 	 * 
 	 */
 	public void updateEndComboBox(JComboBox<String> cbPolaziste, JComboBox<String> cbOdrediste) {
