@@ -10,17 +10,15 @@ import java.awt.event.*;
 import java.io.IOException;
 
 import javax.swing.table.*;
+import java.util.List;
+import model.RouteDetails;
 
 public class AdditionalRoutesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
-	// private JTable tabela; //da li nam ovo treba ovjde ili je okej da
-	// instanciramo samo kad budemo koristili
-	// ne treba ovako jer kasnije necemo da mijenjamo nista na ovoj tabeli, vec samo
-	// da koristimo za prikazivanje podataka i ruta koje se dobiju
 
 	// konsturktor za ovu klasu
-	public AdditionalRoutesFrame(Object[][] rutePodaci) {// uzimace listu objekata rutePodaci o rutama koje ce onda
+	public AdditionalRoutesFrame(List<RouteDetails> routes) {// uzimace listu objekata rutePodaci o rutama koje ce onda
 															// kasnije da renderuje i da prikazuje
 		// ovo je dvodimenzinonalni niz gdje svaki red predstavlja jednu rutu
 		// u kolonama su pojedinacni podaci o rutama. Red objekata so i guess da ce
@@ -32,44 +30,62 @@ public class AdditionalRoutesFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		// kolone tabele koje su niz stringova
-		String[] kolone = { "Polazak", "Dolazak", "Tip", "Cijena", "Akcija" };// trebace nam mozda jos nesto tj trebati
+		//String[] kolone = { "Polazak", "Dolazak", "Tip", "Cijena", "Akcija" };// trebace nam mozda jos nesto tj trebati
 																				// dok skontam, tj presjedanja ako se
 																				// budu trazila
 																				// idk...
 
+		
+		
+        // Create table data from routes
+        Object[][] data = new Object[routes.size()][5];
+        for (int i = 0; i < routes.size(); i++) {
+            RouteDetails route = routes.get(i);
+            data[i] = new Object[]{
+                route.getFormattedTotalTime(),
+                route.getFormattedTotalCost(),
+                route.getTransferCount(),
+                "Detalji", // Placeholder for details button
+                "Kupi kartu" // Placeholder for buy button
+            };
+        }
+
+        String[] kolone = {"Vrijeme", "Cijena", "Presjedanja", "Detalji", "Akcija"};
+        JTable table = new JTable(new DefaultTableModel(data, kolone));
+		
 		// sve ovo mozda moze da se doda u neki poseban panel
 		JLabel lblHeading = new JLabel("Top 5 ruta");
 		lblHeading.setAlignmentX(Component.CENTER_ALIGNMENT);
 		lblHeading.setFont(lblHeading.getFont().deriveFont(Font.BOLD, 24f));
 
-		JTable tabela = new JTable(rutePodaci, kolone)// uzima podatke i header
-		{
-			private static final long serialVersionUID = 1L;
+//		JTable tabela = new JTable(rutePodaci, kolone)// uzima podatke i header
+//		{
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public boolean isCellEditable(int row, int column) {
+//				return column == 4; // oznacimo da samo kolona akcija moze biti interkativna
+//			}
+//		};
 
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return column == 4; // oznacimo da samo kolona akcija moze biti interkativna
-			}
-		};
-
-		tabela.setRowHeight(30);
+		table.setRowHeight(30);
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 		centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
 
-		for (int i = 0; i < tabela.getColumnCount(); i++) {
-			tabela.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		for (int i = 0; i < table.getColumnCount(); i++) {
+			table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 		}
 
 		// Pretvori zadnju kolonu u dugme
 
-		tabela.getColumn("Akcija").setCellRenderer(new ButtonRenderer());
-		tabela.getColumn("Akcija").setCellEditor(new ButtonEditor(new JCheckBox(), tabela));
+		table.getColumn("Akcija").setCellRenderer(new ButtonRenderer());
+		table.getColumn("Akcija").setCellEditor(new ButtonEditor(new JCheckBox(), table));
 
 		JPanel mainPanel = new JPanel();
 
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		JScrollPane scrollPane = new JScrollPane(tabela);
+		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 
 		mainPanel.add(Box.createVerticalStrut(20)); // 20 pixels of vertical space

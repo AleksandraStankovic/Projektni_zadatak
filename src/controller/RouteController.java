@@ -1,9 +1,16 @@
 package controller;
 
 import generator.TransportDataGenerator;
+import org.graphstream.graph.implementations.MultiGraph;
+import graph.TransportGraph;
+import graph.RouteFinder;
+import model.RouteDetails;
+import model.OptimizationCriteria;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-
+import java.util.List;
+import java.util.ArrayList;
 //kontroleer koji ce da kontrolise svu logiku vezanu za rute, da nije u gui i u main frame klasi
 
 /**
@@ -12,6 +19,9 @@ import javax.swing.JComboBox;
 public class RouteController {
 
 	private TransportDataGenerator.TransportData transportData;// podaci koji ce se koristiti
+	private TransportGraph transportGraph;
+	private RouteFinder routeFinder;
+	private List<RouteDetails> currentRoutes; // Store current search results+
 
 	/// ovo nam mece trebati ovo je samo za testiranje da li podaci dobro parsiraju
 	private void printParsedData() {
@@ -44,7 +54,12 @@ public class RouteController {
 
 	{
 		this.transportData = transportData;
-		printParsedData();// ovdje imamo ovo za testiranje
+		this.transportGraph = new TransportGraph(transportData);
+		// In RouteController.java line 57
+		this.routeFinder = new RouteFinder((MultiGraph) transportGraph.buildGraph());
+		this.currentRoutes = new ArrayList<>();
+
+		// printParsedData();// ovdje imamo ovo za testiranje
 	}
 
 	/**
@@ -113,5 +128,94 @@ public class RouteController {
 		cbOdrediste.setModel(new DefaultComboBoxModel<>(endCities.toArray(new String[0])));
 
 	}
+	
+	
+	
+	
+    public List<RouteDetails> findRoutes(String fromCity, String toCity, OptimizationCriteria criteria) {
+        try {
+            List<org.graphstream.graph.Path> paths = routeFinder.findRoutes(fromCity, toCity, criteria, 5);
+            currentRoutes = convertToRouteDetails(paths);
+            return currentRoutes;
+        } catch (Exception e) {
+            System.err.println("Error finding routes: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Converts GraphStream Paths to RouteDetails objects
+     */
+    private List<RouteDetails> convertToRouteDetails(List<org.graphstream.graph.Path> paths) {
+        List<RouteDetails> routeDetailsList = new ArrayList<>();
+        for (org.graphstream.graph.Path path : paths) {
+            routeDetailsList.add(new RouteDetails(path));
+        }
+        return routeDetailsList;
+    }
+
+    /**
+     * Gets the current routes (from last search)
+     */
+    public List<RouteDetails> getCurrentRoutes() {
+        return currentRoutes;
+    }
+
+    /**
+     * Gets the top 5 routes from last search
+     */
+    public List<RouteDetails> getTopRoutes() {
+        return currentRoutes.size() > 5 ? currentRoutes.subList(0, 5) : currentRoutes;
+    }
+
+    /**
+     * Gets the best route from last search
+     */
+    public RouteDetails getBestRoute() {
+        return currentRoutes.isEmpty() ? null : currentRoutes.get(0);
+    }
+
+    /**
+     * Gets the transport graph for visualization
+     */
+    public TransportGraph getTransportGraph() {
+        return transportGraph;
+    }
+
+    /**
+     * Gets the route finder instance
+     */
+    public RouteFinder getRouteFinder() {
+        return routeFinder;
+    }
+
+    /**
+     * Helper method to convert display text to OptimizationCriteria
+     */
+    public OptimizationCriteria getCriteriaFromDisplayText(String displayText) {
+        return OptimizationCriteria.fromDisplayName(displayText);
+    }
+
+    /**
+     * Validates if two cities are different
+     */
+    public boolean validateCities(String fromCity, String toCity) {
+        return fromCity != null && toCity != null && !fromCity.equals(toCity);
+    }
+
+    /**
+     * Gets statistics about the transport network
+     */
+    public String getNetworkStatistics() {
+        if (transportData == null) return "No data loaded";
+        
+        int totalCities = transportData.countryMap.length * transportData.countryMap[0].length;
+        int totalStations = transportData.stations.size() * 2; // Bus + train per city
+        int totalDepartures = transportData.departures.size();
+        
+        return String.format("Cities: %d | Stations: %d | Departures: %d", 
+                           totalCities, totalStations, totalDepartures);
+    }
 
 }
