@@ -14,6 +14,8 @@ import java.awt.*;
 
 import generator.TransportDataGenerator;
 import controller.RouteController;
+import graph.TransportGraph;
+import model.OptimizationCriteria;
 
 public class MainFrame extends JFrame {
 
@@ -36,6 +38,7 @@ public class MainFrame extends JFrame {
 		setLocationRelativeTo(null);
 
 		controller = new RouteController(data);
+		TransportGraph transportGraph = new TransportGraph(data);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -46,6 +49,8 @@ public class MainFrame extends JFrame {
 		cbOdrediste = new JComboBox<>();
 
 		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
+		//sa combo boxom cbKriterijum = new JComboBox<>(OptimizationCriteria.values()); 
+		//skontati da li je dobro tako 
 		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
 
 		controller.initializeComboBoxes(cbPolaziste, cbOdrediste); // trebace se mijenjati
@@ -54,6 +59,7 @@ public class MainFrame extends JFrame {
 		cbPolaziste.addActionListener(e -> controller.updateEndComboBox(cbPolaziste, cbOdrediste));
 
 		JButton btnPronadji = new JButton("Pronađi rutu");
+		//dodati action listener da se nesto desi kad se klikne ovo dugme
 		JButton btnDodatneRute = new JButton("Prikaži dodatne rute");// ostali dugmići koji nam trebaju
 		JButton btnKupi = new JButton("Kupovina karte");
 
@@ -112,6 +118,18 @@ public class MainFrame extends JFrame {
 			AdditionalRoutesFrame frame = new AdditionalRoutesFrame(top5Rute);
 			frame.setVisible(true);
 		});
+		
+		
+		
+		//btn pronadji action listener
+		
+		btnPronadji.addActionListener(e-> {
+			String fromCity = (String) cbPolaziste.getSelectedItem();
+			String toCity = (String) cbOdrediste.getSelectedItem();
+		//dodati za criteria i sve ostalo 
+			
+		}
+		);
 
 		JScrollPane tableScroll = new JScrollPane(table);
 		tableScroll.setPreferredSize(new Dimension(0, 200));
@@ -132,7 +150,7 @@ public class MainFrame extends JFrame {
 		centerPanel.add(tablePanel, BorderLayout.NORTH);
 
 		// kreiramo graf
-		GraphPanel graphPanel = new GraphPanel();
+		GraphPanel graphPanel = new GraphPanel(transportGraph);
 		graphPanel.setBackground(Color.WHITE);
 		centerPanel.add(graphPanel, BorderLayout.CENTER);
 

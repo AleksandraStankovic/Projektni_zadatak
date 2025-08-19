@@ -41,12 +41,11 @@ public class RouteController {
 	}
 
 	public RouteController(TransportDataGenerator.TransportData transportData)
-																				
+
 	{
 		this.transportData = transportData;
 		printParsedData();// ovdje imamo ovo za testiranje
 	}
-
 
 	/**
 	 * 
@@ -68,9 +67,9 @@ public class RouteController {
 		return cities;
 	}
 
-	
-
-	/**Initializes origin and departure combo boxes with list of cities	 
+	/**
+	 * Initializes origin and departure combo boxes with list of cities
+	 * 
 	 * @param cbPolaziste Combo box with list of possible origin cities
 	 * @param cbOdrediste Combo box with list of possible destination cities
 	 */
