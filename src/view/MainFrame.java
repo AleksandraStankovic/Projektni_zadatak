@@ -34,25 +34,48 @@ public class MainFrame extends JFrame {
 	private RouteController controller;
 	
 	
+//	private void updateTable(RouteDetails route) {
+//	    if (route == null || route.getSegments() == null) return;
+//	    
+//	    // Create data array for the table
+//	    Object[][] data = new Object[route.getSegments().size()][5];
+//	    for (int i = 0; i < route.getSegments().size(); i++) {
+//	        model.RouteSegment segment = route.getSegments().get(i);
+//	        data[i] = new Object[]{
+//	            segment.getDepartureTime(),
+//	            segment.getArrivalTime(),
+//	            segment.getTransportType(),
+//	            segment.getFormattedDuration(),
+//	            segment.getFormattedPrice()
+//	        };
+//	    }
+//	    
+//	    // Update table columns to include duration
+//	    String[] columns = {"Polazak", "Dolazak", "Tip", "Trajanje", "Cijena"};
+//	    table.setModel(new DefaultTableModel(data, columns));
+//	}
+	
+	
+	// In MainFrame.java, replace the updateTable method with this simple version:
 	private void updateTable(RouteDetails route) {
-	    if (route == null || route.getSegments() == null) return;
+	    if (route == null) return;
 	    
-	    // Create data array for the table
-	    Object[][] data = new Object[route.getSegments().size()][5];
-	    for (int i = 0; i < route.getSegments().size(); i++) {
-	        model.RouteSegment segment = route.getSegments().get(i);
-	        data[i] = new Object[]{
-	            segment.getDepartureTime(),
-	            segment.getArrivalTime(),
-	            segment.getTransportType(),
-	            segment.getFormattedDuration(),
-	            segment.getFormattedPrice()
-	        };
-	    }
+	    // Create a simple summary table
+	    Object[][] data = {
+	        {"Ukupno vrijeme putovanja", route.getFormattedTotalTime()},
+	        {"Ukupna cijena karte", route.getFormattedTotalCost()},
+	        {"Ukupan broj presjedanja", route.getTransferCount()},
+	        {"Broj segmenta puta", route.getSegments() != null ? route.getSegments().size() : 0}
+	    };
 	    
-	    // Update table columns to include duration
-	    String[] columns = {"Polazak", "Dolazak", "Tip", "Trajanje", "Cijena"};
+	    String[] columns = {"Informacija o ruti", "Vrijednost"};
 	    table.setModel(new DefaultTableModel(data, columns));
+	    
+	    // Update the summary label
+	    lblUkupno.setText(String.format("Pronađena ruta: %s | %s | %d presjedanja", 
+	        route.getFormattedTotalTime(), 
+	        route.getFormattedTotalCost(), 
+	        route.getTransferCount()));
 	}
 
 	public MainFrame(TransportDataGenerator.TransportData data) { // dakle, u ovo proslijedimo data, koji onda moramo da
@@ -75,14 +98,22 @@ public class MainFrame extends JFrame {
 		cbOdrediste = new JComboBox<>();
 
 		
+//		
+//	    cbKriterijum = new JComboBox<>(new String[] { 
+//	            OptimizationCriteria.SHORTEST_TIME.toString(),
+//	            OptimizationCriteria.LOWEST_COST.toString(),
+//	            OptimizationCriteria.FEWEST_TRANSFERS.toString()
+//	        });
 		
-	    cbKriterijum = new JComboBox<>(new String[] { 
-	            OptimizationCriteria.SHORTEST_TIME.toString(),
-	            OptimizationCriteria.LOWEST_COST.toString(),
-	            OptimizationCriteria.FEWEST_TRANSFERS.toString()
-	        });
 		
-		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
+		
+//		cbKriterijum = new JComboBox<>(new String[] { "Najkraće vrijeme", "Najniža cijena", "Najmanje presjedanja" });
+		
+		cbKriterijum = new JComboBox<>(new String[] { 
+			    OptimizationCriteria.SHORTEST_TIME.getDisplayName(),
+			    OptimizationCriteria.LOWEST_COST.getDisplayName(),
+			    OptimizationCriteria.FEWEST_TRANSFERS.getDisplayName()
+			});
 		
 		cbKriterijum.setPreferredSize(new Dimension(150, cbKriterijum.getPreferredSize().height));
 
@@ -158,9 +189,6 @@ public class MainFrame extends JFrame {
         });
 
         
-        
-        
-        // btnPronadji action listener - FIXED VERSION
         btnPronadji.addActionListener(e -> {
             String fromCity = (String) cbPolaziste.getSelectedItem();
             String toCity = (String) cbOdrediste.getSelectedItem();
@@ -179,17 +207,15 @@ public class MainFrame extends JFrame {
             if (routes == null || routes.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih gradova.", "Informacija", JOptionPane.INFORMATION_MESSAGE);
                 // Clear table
-                table.setModel(new DefaultTableModel(new Object[][]{}, kolone));
-                lblUkupno.setText("Nema dostupnih ruta");
+                table.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija", "Vrijednost"}));
+                lblUkupno.setText("Nema dostupnih ruta između " + fromCity + " i " + toCity);
             } else {
                 // Display the best route
                 updateTable(routes.get(0));
-                lblUkupno.setText(String.format("Ukupno: %s | %s | %d presjedanja", 
-                    routes.get(0).getFormattedTotalTime(), 
-                    routes.get(0).getFormattedTotalCost(), 
-                    routes.get(0).getTransferCount()));
             }
         });
+        
+
 
         JScrollPane tableScroll = new JScrollPane(table);
         tableScroll.setPreferredSize(new Dimension(0, 200));
