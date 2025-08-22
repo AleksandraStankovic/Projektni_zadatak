@@ -153,39 +153,35 @@ public class MainFrame extends JFrame {
 		    AdditionalRoutesFrame additionalFrame = new AdditionalRoutesFrame(fromCity, toCity, criteria, controller);
 		    additionalFrame.setVisible(true);  
 		    
-		    
-		    
 
 		});
 
 
 
         
-        btnPronadji.addActionListener(e -> {
-            String fromCity = (String) cbPolaziste.getSelectedItem();
-            String toCity = (String) cbOdrediste.getSelectedItem();
-            String selectedCriteria = (String) cbKriterijum.getSelectedItem();
-            
-            
-            OptimizationCriteria criteria = controller.getCriteriaFromDisplayText(selectedCriteria);
-            
-            if (fromCity.equals(toCity)) {
-                JOptionPane.showMessageDialog(this, "Odaberite različite gradove.", "Greška", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+		btnPronadji.addActionListener(e -> {
+		    String fromCity = (String) cbPolaziste.getSelectedItem();
+		    String toCity = (String) cbOdrediste.getSelectedItem();
+		    String selectedCriteria = (String) cbKriterijum.getSelectedItem();
 
-            List<RouteDetails> routes = controller.findRoutes(fromCity, toCity, criteria);
-            
-            if (routes == null || routes.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih gradova.", "Informacija", JOptionPane.INFORMATION_MESSAGE);
-                
-                table.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija", "Vrijednost"}));
-                lblUkupno.setText("Nema dostupnih ruta između " + fromCity + " i " + toCity);
-            } else {
-                
-                updateTable(routes.get(0));
-            }
-        });
+		    OptimizationCriteria criteria = controller.getCriteriaFromDisplayText(selectedCriteria);
+
+		    if (fromCity.equals(toCity)) {
+		        JOptionPane.showMessageDialog(this, "Odaberite različite gradove.", "Greška", JOptionPane.ERROR_MESSAGE);
+		        return;
+		    }
+
+		    RouteDetails bestRoute = controller.findBestRoute(fromCity, toCity, criteria);
+
+		    if (bestRoute == null) {
+		        JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih gradova.", "Informacija", JOptionPane.INFORMATION_MESSAGE);
+		        table.setModel(new DefaultTableModel(new Object[][]{}, columns));
+		        lblUkupno.setText("Nema dostupnih ruta između " + fromCity + " i " + toCity);
+		    } else {
+		        updateTable(bestRoute);
+		    }
+		});
+
         
 
 
