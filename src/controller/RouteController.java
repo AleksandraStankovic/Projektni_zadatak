@@ -174,7 +174,7 @@ public class RouteController {
 	            if (!start.equals(end)) {
 	                PathInfo path = routeFinder.dijkstraShortestPath(start, end, criteria);
 	                if (path != null) {
-	                    // Keep the best path according to the criteria
+	                    
 	                    if (bestPathInfo == null) {
 	                        bestPathInfo = path;
 	                    } else {
@@ -197,10 +197,10 @@ public class RouteController {
 
 	    if (bestPathInfo == null) return null;
 
-	    // Convert the best path to RouteDetails
+	 
 	    RouteDetails bestRoute = new RouteDetails(bestPathInfo);
 	    currentRoutes = new ArrayList<>();
-	    currentRoutes.add(bestRoute); // store in currentRoutes for GUI or later use
+	    currentRoutes.add(bestRoute); 
 	    return bestRoute;
 	}
 
