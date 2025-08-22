@@ -1,27 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //package graph;
 //
 //import org.graphstream.graph.Edge;
@@ -38,24 +14,11 @@
 //
 //	private final MultiGraph graph;
 //
-//	public RouteFinder(MultiGraph graph)// dakle, kad ovo budemo trazili, moraće se prosliejediti graf ovdje
-//	{
+//	public RouteFinder(MultiGraph graph) {
 //		this.graph = graph;
 //	}
 //
-//	/**
-//	 * Finds all stations in given city.
-//	 * 
-//	 * @param city
-//	 * @return
-//	 */
-//	private List<Node> getStationsForCity(String city)// uzima grad i onda uzima sve stanice za taj grad iz grafa,
-//														// idk...
-//	{// moza ima bolji nacin? //Mozda ovo moze na neko drugo mjesto?
-//		// idemo kroz graf i nodes, uzimamo taj grad pronajdemo stanice za njega i
-//		// stavimo u listu stanica za taj grad
-//		// bukvalno pronalazi sve stanice u datom gradu
-//
+//	private List<Node> getStationsForCity(String city) {
 //		List<Node> stations = new ArrayList<>();
 //		for (Node node : graph) {
 //			if (node.getAttribute("city").equals(city)) {
@@ -63,15 +26,12 @@
 //			}
 //		}
 //		return stations;
-//
-//	}// ovo kasnije koristimo da uzmemo sve stanice iz prvog i pocetnog grada, gdje
-//		// dakle uzmemo pocetne i krajnje stanice
+//	}
 //
 //	private int getEdgeWeight(Edge edge, OptimizationCriteria criteria) {
 //		String edgeType = (String) edge.getAttribute("type");
 //
 //		if (edgeType == null) {
-//			System.out.println("WARNING: Edge " + edge.getId() + " has no type attribute!");
 //			return 1;
 //		}
 //
@@ -84,7 +44,7 @@
 //			}
 //		case LOWEST_COST:
 //			if ("transfer".equals(edgeType)) {
-//				return 0; // Transfers are free
+//				return 0;
 //			} else {
 //				return (int) edge.getNumber("price");
 //			}
@@ -95,193 +55,328 @@
 //		}
 //	}
 //
-//	// metoda za odlucivanje da li je nesto bolji path ili ne
-//	// provjerava da li je novi path bolji od postojeceg, bukvalno za poredjenje
-//	// putanja
-//	// za razlicite kriterijume vraca true ako je kod novog manje ukupno vrijeme i
-//	// ostali kriterijumi
-//	private boolean isBetterPath(PathInfo newPath, PathInfo existingPath, OptimizationCriteria criteria) {
-//		switch (criteria) {
-//		case SHORTEST_TIME:
-//			return newPath.getTotalTime() < existingPath.getTotalTime();
-//		case LOWEST_COST:
-//			return newPath.getTotalCost() < existingPath.getTotalCost();// myb
-//		case FEWEST_TRANSFERS:
-//			return newPath.getTotalTransfers() < existingPath.getTotalTransfers();
-//		default:
-//			return false;
-//		}
-//	}// vraca true ako je novi put bolji od prethodnog po nekom kriterijumu
+//	/**
+//	 * Gets all leaving edges from a node for GraphStream 2.0
+//	 */
+//	private List<Edge> getLeavingEdges(Node node) {
+//		List<Edge> leavingEdges = new ArrayList<>();
 //
-//	// metoda za odlucicanje da li terba putanja da se doda ili ne, idk....
-//	// odlicuje da li da se novootkrivena putanja zadrzi do nekog cvora u odnosu na
-//	// postojece
-////    //uzima mapu sa cvorovima i list sa najboljom putanjom da se dodje do tog cvora
-////    destination node do kog dolatimo
-////    novi path koji gledamo da li zelimo da uvrstimo 
-////    po kom kriterijumu gledamo. 
-//	// provjeravamo koji put je bolji, ako je novi bolji, dodajemo ga u listu novih
-//	private boolean shouldAddPath(Map<Node, List<PathInfo>> bestPaths, Node node, PathInfo newPath,
-//			OptimizationCriteria criteria) {
-//
-//		List<PathInfo> existingPaths = bestPaths.getOrDefault(node, Collections.emptyList());
-//		// dobicemo mapu sa parovima cvor-najbolje putanje, ekstrahujemo najbolje
-//		// putanje za dati node
-//
-//		if (existingPaths.size() < 5) {// ako imamo manje od 5, sigurno cemo da zadrzimo. Ako nemamo provjeravamo dalje
-//										// idk
-//			return true;
-//		}
-//
-//		for (PathInfo existing : existingPaths) {
-//			if (isBetterPath(newPath, existing, criteria)) {
-//				return true;
+//		// GraphStream 2.0: Iterate through all edges and check source
+//		for (Edge edge : graph.edges().toArray(Edge[]::new)) {
+//			if (edge.getSourceNode().equals(node)) {
+//				leavingEdges.add(edge);
 //			}
 //		}
 //
-//		return false;
-//
+//		return leavingEdges;
 //	}
 //
-//	// idk, uglavnom racuna ukupono kolika je tezina putanje
-//	// metoda za pronalazenje weigta ukuponog za citavu putanju
-//	private int getPathWeight(Path path, OptimizationCriteria criteria) {
-//		return path.getEdgeSet().stream()// path uzima sve ivice iz putanje
-//				.mapToInt(edge -> getEdgeWeight(edge, criteria))// mapira na njegovu tezinu i sumira
-//				.sum();
-//	}
+//	/**
+//	 * Dijkstra's algorithm implementation for single shortest path
+//	 */
+//	private PathInfo findShortestPath(Node start, Node end, OptimizationCriteria criteria) {
+//		// Initialize data structures
+//		Map<Node, Integer> distances = new HashMap<>();
+//		Map<Node, Node> previousNodes = new HashMap<>();
+//		Map<Node, Edge> previousEdges = new HashMap<>();
+//		PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
 //
-//	// idk, bukvalno sortiranje putanja i guess....
-//	private void sortPaths(List<Path> paths, OptimizationCriteria criteria) {
-//		paths.sort((p1, p2) -> {
-//			int weight1 = getPathWeight(p1, criteria);
-//			int weight2 = getPathWeight(p2, criteria); // Fixed: p2 instead of p1
-//			return Integer.compare(weight1, weight2);
-//		});
-//	}
+//		// Initialize all nodes with infinity distance
+//		for (Node node : graph) {
+//			distances.put(node, Integer.MAX_VALUE);
+//			previousNodes.put(node, null);
+//			previousEdges.put(node, null);
+//		}
 //
-////	private List<Edge> getLeavingEdges(Node node) {
-////	    List<Edge> edges = new ArrayList<>();
-////	    Iterator<? extends Edge> iterator = node.getLeavingEdgeIterator();
-////	    while (iterator.hasNext()) {
-////	        edges.add(iterator.next());
-////	    }
-////	    return edges;
-////	}
-//
-//	// ova bitna metoda za pronalazenje puteva
-//
-//	private List<Path> findPaths(Node start, Node end, OptimizationCriteria criteria) {
-//		PriorityQueue<PathInfo> queue = new PriorityQueue<>(Comparator.comparingInt(pi -> pi.getTotalWeight()));
-//		Map<Node, List<PathInfo>> bestPaths = new HashMap<>();
-//
-//		PathInfo initialPath = new PathInfo(new Path(), 0, 0, 0, 0);
-//		initialPath.getPath().setRoot(start);
-//		queue.add(initialPath);
-//		bestPaths.put(start, new ArrayList<>(Collections.singletonList(initialPath)));
+//		// Start node has 0 distance
+//		distances.put(start, 0);
+//		queue.add(start);
 //
 //		while (!queue.isEmpty()) {
-//			PathInfo current = queue.poll();
-//			Path currentPath = current.getPath();
+//			Node current = queue.poll();
 //
-//			if (currentPath.getNodeCount() == 0) {
+//			// Stop if we reached the end node
+//			if (current.equals(end)) {
+//				break;
+//			}
+//
+//			// Skip if we've already found a better path to this node
+//			if (distances.get(current) == Integer.MAX_VALUE) {
 //				continue;
 //			}
 //
-//			List<Node> nodePath = currentPath.getNodePath();
-//			if (nodePath.isEmpty())
-//				continue;
-//			Node currentNode = nodePath.get(nodePath.size() - 1);
+//			// Explore all neighbors using getLeavingEdges
+//			for (Edge edge : getLeavingEdges(current)) {
+//				Node neighbor = edge.getTargetNode();
+//				int weight = getEdgeWeight(edge, criteria);
+//				int newDistance = distances.get(current) + weight;
 //
-//			if (currentNode.equals(end)) {
-//				continue;
-//			}
+//				// If we found a shorter path to the neighbor
+//				if (newDistance < distances.get(neighbor)) {
+//					distances.put(neighbor, newDistance);
+//					previousNodes.put(neighbor, current);
+//					previousEdges.put(neighbor, edge);
 //
-//			// Get edges using the most basic method - compatible with all GraphStream
-//			// versions
-//			for (int i = 0; i < currentNode.getDegree(); i++) {
-//				Edge edge = currentNode.getEdge(i);
-//
-//				// Determine direction and get neighbor
-//				Node neighbor;
-//				if (edge.getSourceNode().equals(currentNode)) {
-//					neighbor = edge.getTargetNode();
-//				} else if (edge.getTargetNode().equals(currentNode)) {
-//					neighbor = edge.getSourceNode();
-//				} else {
-//					continue; // Shouldn't happen
-//				}
-//
-//				// Calculate weights
-//				int timeDelta = getEdgeWeight(edge, OptimizationCriteria.SHORTEST_TIME);
-//				int costDelta = getEdgeWeight(edge, OptimizationCriteria.LOWEST_COST);
-//				int transfersDelta = getEdgeWeight(edge, OptimizationCriteria.FEWEST_TRANSFERS);
-//				int totalWeightDelta = getEdgeWeight(edge, criteria);
-//
-//				int newTotalTime = current.getTotalTime() + timeDelta;
-//				int newTotalCost = current.getTotalCost() + costDelta;
-//				int newTotalTransfers = current.getTotalTransfers() + transfersDelta;
-//				int newTotalWeight = current.getTotalWeight() + totalWeightDelta;
-//
-//				// Create new path
-//				Path newPath = new Path();
-//				newPath.setRoot(currentPath.getRoot());
-//
-//				// Copy all edges from current path
-//				for (Edge existingEdge : currentPath.getEdgePath()) {
-//					newPath.add(existingEdge);
-//				}
-//
-//				// Add the new edge
-//				newPath.add(edge);
-//
-//				PathInfo newPathInfo = new PathInfo(newPath, newTotalTime, newTotalCost, newTotalTransfers,
-//						newTotalWeight);
-//
-//				if (shouldAddPath(bestPaths, neighbor, newPathInfo, criteria)) {
-//					queue.add(newPathInfo);
-//					bestPaths.computeIfAbsent(neighbor, k -> new ArrayList<>()).add(newPathInfo);
+//					// Remove and re-add to update priority
+//					queue.remove(neighbor);
+//					queue.add(neighbor);
 //				}
 //			}
 //		}
 //
-//		return bestPaths.getOrDefault(end, Collections.emptyList()).stream().map(PathInfo::getPath)
-//				.collect(Collectors.toList());
+//		// If no path found
+//		if (distances.get(end) == Integer.MAX_VALUE) {
+//			return null;
+//		}
+//
+//		// Reconstruct the path
+//		Path path = reconstructPath(start, end, previousNodes, previousEdges);
+//
+//		// Calculate path metrics
+//		int totalTime = calculatePathMetric(path, OptimizationCriteria.SHORTEST_TIME);
+//		int totalCost = calculatePathMetric(path, OptimizationCriteria.LOWEST_COST);
+//		int totalTransfers = calculatePathMetric(path, OptimizationCriteria.FEWEST_TRANSFERS);
+//		int totalWeight = distances.get(end);
+//
+//		return new PathInfo(path, totalTime, totalCost, totalTransfers, totalWeight);
 //	}
 //
-//	// metoda za pronalazenje ruta
-//	public List<Path> findRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int maxResults) {
-//		// idk, ima ovjde nekih metoda, idk...koje su pomocne, koje cemo gore definisati
+//	/**
+//	 * Reconstructs the path from start to end using previous nodes and edges
+//	 */
+//	private Path reconstructPath(Node start, Node end, Map<Node, Node> previousNodes, Map<Node, Edge> previousEdges) {
+//		List<Node> nodePath = new ArrayList<>();
+//		List<Edge> edgePath = new ArrayList<>();
 //
-//		List<Node> startNodes = getStationsForCity(fromCity);// uzmemo pocetne stanice
+//		// Backtrack from end to start
+//		Node current = end;
+//		while (current != null && !current.equals(start)) {
+//			nodePath.add(0, current);
+//			Edge edge = previousEdges.get(current);
+//			if (edge != null) {
+//				edgePath.add(0, edge);
+//			}
+//			current = previousNodes.get(current);
+//		}
+//		nodePath.add(0, start);
+//
+//		// Build the path manually since GraphStream 2.0 Path API is different
+//		Path path = new Path();
+//		if (!nodePath.isEmpty()) {
+//			path.setRoot(nodePath.get(0));
+//			for (int i = 0; i < edgePath.size(); i++) {
+//				path.add(edgePath.get(i));
+//			}
+//		}
+//
+//		return path;
+//	}
+//
+//	/**
+//	 * Calculates a specific metric for the entire path
+//	 */
+//	private int calculatePathMetric(Path path, OptimizationCriteria criteria) {
+//		int total = 0;
+//
+//		// Manual iteration through edges in the path
+//		// In GraphStream 2.0, we need to manually track edges
+//		if (path.size() > 0) {
+//			Node current = path.getRoot();
+//			for (int i = 0; i < path.size(); i++) {
+//				// Find the edge from current to next node
+//				Node next = getNextNodeInPath(path, i);
+//				Edge edge = current.getEdgeBetween(next);
+//				if (edge != null) {
+//					total += getEdgeWeight(edge, criteria);
+//				}
+//				current = next;
+//			}
+//		}
+//		return total;
+//	}
+//
+//	/**
+//	 * Helper to get next node in path (GraphStream 2.0 compatibility)
+//	 */
+//	private Node getNextNodeInPath(Path path, int edgeIndex) {
+//		// This is a workaround for GraphStream 2.0 Path API limitations
+//		// We need to manually track the path nodes
+//		Node current = path.getRoot();
+//		for (int i = 0; i <= edgeIndex; i++) {
+//			// Find all edges from current node and see which one is in the path
+//			for (Edge edge : graph.edges().toArray(Edge[]::new)) {
+//				if (edge.getSourceNode().equals(current)) {
+//					// Check if this edge leads to the next node in our reconstructed path
+//					// This is simplified - in real implementation, you'd track nodes better
+//					current = edge.getTargetNode();
+//					break;
+//				}
+//			}
+//		}
+//		return current;
+//	}
+//
+//	/**
+//	 * Finds the best routes between two cities
+//	 */
+//	public List<PathInfo> findRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int maxResults) {
+//		List<Node> startNodes = getStationsForCity(fromCity);
 //		List<Node> endNodes = getStationsForCity(toCity);
 //
+//		System.out.println("Finding routes from " + fromCity + " to " + toCity);
 //		System.out.println("Start stations: " + startNodes.stream().map(Node::getId).collect(Collectors.toList()));
 //		System.out.println("End stations: " + endNodes.stream().map(Node::getId).collect(Collectors.toList()));
 //
-//		List<Path> allPaths = new ArrayList<>();
+//		List<PathInfo> allPaths = new ArrayList<>();
 //
-//		// sad ide pronalazenje kombinacija tj pronalazak svih puteva za kombinaciju
-//		// stanica
-//
+//		// Find shortest path between each start and end station combination
 //		for (Node start : startNodes) {
 //			for (Node end : endNodes) {
-//				if (!start.equals(end))// ako pocetak i start nisu isti I guess
-//				{
-//					System.out.println("Finding paths from " + start.getId() + " to " + end.getId());
-//					List<Path> paths = findPaths(start, end, criteria);
-//					System.out.println("Found " + paths.size() + " paths");
-//					allPaths.addAll(paths);
+//				if (!start.equals(end)) {
+//					System.out.println("Finding path from " + start.getId() + " to " + end.getId());
+//					PathInfo path = findShortestPath(start, end, criteria);
+//					if (path != null) {
+//						allPaths.add(path);
+//						System.out.println("Found path with weight: " + path.getTotalWeight());
+//					} else {
+//						System.out.println("No path found");
+//					}
 //				}
 //			}
 //		}
-//		System.out.println("Total paths found: " + allPaths.size());
-//		sortPaths(allPaths, criteria);
 //
-//		List<Path> result = allPaths.stream().limit(maxResults).collect(Collectors.toList());
-//		System.out.println("Returning " + result.size() + " results");
-//		return result;
+//		// Sort paths based on the optimization criteria
+//		Comparator<PathInfo> comparator = getComparatorForCriteria(criteria);
+//		List<PathInfo> sortedPaths = allPaths.stream().sorted(comparator).collect(Collectors.toList());
 //
+//		System.out.println("Total paths found: " + sortedPaths.size());
+//		return sortedPaths.stream().limit(maxResults).collect(Collectors.toList());
 //	}
 //
+//	/**
+//	 * Gets the appropriate comparator for the optimization criteria
+//	 */
+//	private Comparator<PathInfo> getComparatorForCriteria(OptimizationCriteria criteria) {
+//		// Sort by the actual weight used in pathfinding, not the display metrics
+//		return Comparator.comparingInt(PathInfo::getTotalWeight);
+//	}
+//
+//	/**
+//	 * Alternative method that returns detailed path information
+//	 */
+//	public PathInfo findBestRoute(String fromCity, String toCity, OptimizationCriteria criteria) {
+//		List<PathInfo> routes = findRoutes(fromCity, toCity, criteria, 1);
+//		return routes.isEmpty() ? null : routes.get(0);
+//	}
+//
+//	/**
+//	 * Gets detailed information about a path for display purposes
+//	 */
+//	public List<String> getPathDetails(PathInfo pathInfo) {
+//		List<String> details = new ArrayList<>();
+//		Path path = pathInfo.getPath();
+//
+//		if (path.size() == 0) {
+//			details.add("Direct connection - no transfers needed");
+//			return details;
+//		}
+//
+//		// Manual path traversal for GraphStream 2.0
+//		List<Node> nodes = new ArrayList<>();
+//		List<Edge> edges = new ArrayList<>();
+//
+//		Node current = path.getRoot();
+//		nodes.add(current);
+//
+//		// Manually reconstruct the path edges and nodes
+//		for (int i = 0; i < path.size(); i++) {
+//			// Find the edge from current node
+//			for (Edge edge : graph.edges().toArray(Edge[]::new)) {
+//				if (edge.getSourceNode().equals(current)) {
+//					// Check if this edge is part of our path
+//					// This is simplified - would need proper path tracking
+//					edges.add(edge);
+//					current = edge.getTargetNode();
+//					nodes.add(current);
+//					break;
+//				}
+//			}
+//		}
+//
+//		String currentTransport = getTransportTypeFromNode(nodes.get(0));
+//		String currentCity = (String) nodes.get(0).getAttribute("city");
+//
+//		details.add("Start at " + nodes.get(0).getId() + " in " + currentCity);
+//
+//		for (int i = 0; i < edges.size(); i++) {
+//			Edge edge = edges.get(i);
+//			Node nextNode = nodes.get(i + 1);
+//			String nextTransport = getTransportTypeFromNode(nextNode);
+//			String nextCity = (String) nextNode.getAttribute("city");
+//
+//			String edgeType = (String) edge.getAttribute("type");
+//
+//			if ("transfer".equals(edgeType)) {
+//				details.add("Transfer from " + currentTransport + " to " + nextTransport + " (Wait: "
+//						+ getEdgeWeight(edge, OptimizationCriteria.SHORTEST_TIME) + " min)");
+//			} else {
+//				details.add("Take " + currentTransport + " from " + currentCity + " to " + nextCity + " (Time: "
+//						+ getEdgeWeight(edge, OptimizationCriteria.SHORTEST_TIME) + " min, Cost: "
+//						+ getEdgeWeight(edge, OptimizationCriteria.LOWEST_COST) + " €)");
+//			}
+//
+//			currentTransport = nextTransport;
+//			currentCity = nextCity;
+//		}
+//
+//		details.add("Arrive at " + nodes.get(nodes.size() - 1).getId() + " in " + currentCity);
+//		details.add("Total time: " + pathInfo.getTotalTime() + " minutes");
+//		details.add("Total cost: " + pathInfo.getTotalCost() + " €");
+//		details.add("Total transfers: " + pathInfo.getTotalTransfers());
+//
+//		return details;
+//	}
+//
+//	private String getTransportTypeFromNode(Node node) {
+//		String nodeId = node.getId();
+//		if (nodeId.startsWith("A_")) {
+//			return "Bus";
+//		} else if (nodeId.startsWith("Z_")) {
+//			return "Train";
+//		}
+//		return "Unknown";
+//	}
+//
+////	/**
+////	 * Method to get top 5 routes for the assignment requirement
+////	 */
+////	public List<PathInfo> findTop5Routes(String fromCity, String toCity, OptimizationCriteria criteria) {
+////		return findRoutes(fromCity, toCity, criteria, 5);
+////	}
+//
+//	/**
+//	 * Method to get path information for table display
+//	 */
+//	public Object[][] getPathTableData(List<PathInfo> paths) {
+//		Object[][] data = new Object[paths.size()][5];
+//
+//		for (int i = 0; i < paths.size(); i++) {
+//			PathInfo path = paths.get(i);
+//			data[i][0] = i + 1; // Rank
+//			data[i][1] = path.getTotalTime() + " min";
+//			data[i][2] = path.getTotalCost() + " €";
+//			data[i][3] = path.getTotalTransfers();
+//			data[i][4] = "View Details"; // Button text
+//		}
+//
+//		return data;
+//	}
+//
+//	// dio koda za pronalazanje 5 najboljih ruta
+//
 //}
+
+
+
+
+//ovo zakomentarisano je dobro, ne dirari  STARA VERZIJA KOJA JE RADILA ZA NAJBOLJU RUTU

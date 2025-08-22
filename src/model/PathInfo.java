@@ -15,9 +15,10 @@ public class PathInfo {
         this.totalCost = totalCost;
         this.totalTransfers = totalTransfers;
         this.totalWeight = totalWeight;
+        
     }
 
-    // Getters
+   
     public Path getPath() { return path; }
     public int getTotalTime() { return totalTime; }
     public int getTotalCost() { return totalCost; }

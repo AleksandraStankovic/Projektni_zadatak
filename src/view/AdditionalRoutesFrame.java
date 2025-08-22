@@ -2,7 +2,7 @@ package view;
 import model.Racun;
 import util.RacunUtil;
 
-import java.awt.*;//i guess da je ovo za action listeners
+import java.awt.*;
 
 import javax.swing.*;
 
@@ -12,91 +12,167 @@ import java.io.IOException;
 import javax.swing.table.*;
 import java.util.List;
 import model.RouteDetails;
+import controller.RouteController;
+import model.OptimizationCriteria;
+import model.RouteSegment;
+
+
+
 
 public class AdditionalRoutesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 
-	// konsturktor za ovu klasu
-	public AdditionalRoutesFrame(List<RouteDetails> routes) {// uzimace listu objekata rutePodaci o rutama koje ce onda
-															// kasnije da renderuje i da prikazuje
-		// ovo je dvodimenzinonalni niz gdje svaki red predstavlja jednu rutu
-		// u kolonama su pojedinacni podaci o rutama. Red objekata so i guess da ce
-		// svaka ruta biti objekat.
+    
+    
+	private JTable table;
+    
+	String[] columns = {"Ruta", "Polazak", "Dolazak", "Tip", "Cijena" , "Akcija"}; //dodati jos kolona za ukupnu cijenu i ukupno trajanje
+    
 
-		setTitle("Top 5 ruta");
-		setSize(700, 400);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		// kolone tabele koje su niz stringova
-		//String[] kolone = { "Polazak", "Dolazak", "Tip", "Cijena", "Akcija" };// trebace nam mozda jos nesto tj trebati
-																				// dok skontam, tj presjedanja ako se
-																				// budu trazila
-																				// idk...
-
-		
-		
-        // Create table data from routes
-        Object[][] data = new Object[routes.size()][5];
-        for (int i = 0; i < routes.size(); i++) {
-            RouteDetails route = routes.get(i);
-            data[i] = new Object[]{
-                route.getFormattedTotalTime(),
-                route.getFormattedTotalCost(),
-                route.getTransferCount(),
-                "Detalji", // Placeholder for details button
-                "Kupi kartu" // Placeholder for buy button
-            };
-        }
-
-        String[] kolone = {"Vrijeme", "Cijena", "Presjedanja", "Detalji", "Akcija"};
-        JTable table = new JTable(new DefaultTableModel(data, kolone));
-		
-		// sve ovo mozda moze da se doda u neki poseban panel
-		JLabel lblHeading = new JLabel("Top 5 ruta");
-		lblHeading.setAlignmentX(Component.CENTER_ALIGNMENT);
-		lblHeading.setFont(lblHeading.getFont().deriveFont(Font.BOLD, 24f));
-
-//		JTable tabela = new JTable(rutePodaci, kolone)// uzima podatke i header
-//		{
-//			private static final long serialVersionUID = 1L;
+//	private void updateTable(List<RouteDetails> routes) {
+//	    if (routes == null || routes.isEmpty()) {
+//	        table.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija"}));
+//	        
+//	        return;
+//	    }
 //
-//			@Override
-//			public boolean isCellEditable(int row, int column) {
-//				return column == 4; // oznacimo da samo kolona akcija moze biti interkativna
-//			}
-//		};
+//	    
+//	    Object[][] data = new Object[Math.min(5, routes.size())][4];
+//
+//	    for (int i = 0; i < Math.min(5, routes.size()); i++) {
+//	        RouteDetails route = routes.get(i);
+//	        data[i][0] = route.getFormattedTotalTime();
+//	        data[i][1] = route.getFormattedTotalCost();
+//	        data[i][2] = route.getTransferCount();
+//	    }
+//
+//	    table.setModel(new DefaultTableModel(data, columns));
+//	   
+//	}
+	
+	public AdditionalRoutesFrame(String fromCity, String toCity, OptimizationCriteria criteria,
+            RouteController controller) {
 
-		table.setRowHeight(30);
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-		centerRenderer.setVerticalAlignment(SwingConstants.CENTER);
+setTitle("Top 5 ruta");
+setSize(700, 400);
+setLocationRelativeTo(null);
+setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		for (int i = 0; i < table.getColumnCount(); i++) {
-			table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-		}
+List<RouteDetails> routes = controller.findTopKRoutes(fromCity, toCity, criteria, 5);
 
-		// Pretvori zadnju kolonu u dugme
+if (routes == null || routes.isEmpty()) {
+JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih gradova.", 
+                     "Informacija", JOptionPane.INFORMATION_MESSAGE);
+table = new JTable(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija", "Vrijednost"}));
+} else {
 
-		table.getColumn("Akcija").setCellRenderer(new ButtonRenderer());
-		table.getColumn("Akcija").setCellEditor(new ButtonEditor(new JCheckBox(), table));
+// Count total rows
+int totalRows = routes.stream().mapToInt(r -> r.getSegments().size()).sum();
+Object[][] data = new Object[totalRows][columns.length];
 
-		JPanel mainPanel = new JPanel();
+int rowIndex = 0;
+for (int r = 0; r < routes.size(); r++) {
+RouteDetails route = routes.get(r);
+List<RouteSegment> segments = route.getSegments();
+for (RouteSegment seg : segments) {
+data[rowIndex][0] = "Ruta " + (r + 1);
+data[rowIndex][1] = seg.getFromStation() + (seg.getDepartureTime() != null ? " (" + seg.getDepartureTime() + ")" : "");
+data[rowIndex][2] = seg.getToStation() + (seg.getArrivalTime() != null ? " (" + seg.getArrivalTime() + ")" : "");
+data[rowIndex][3] = seg.getTransportType();
+data[rowIndex][4] = seg.getFormattedPrice();
+data[rowIndex][5] = "Kupi kartu";
+rowIndex++;
+}
+}
 
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+DefaultTableModel model = new DefaultTableModel(data, columns) {
+private static final long serialVersionUID = 1L;
 
-		mainPanel.add(Box.createVerticalStrut(20)); // 20 pixels of vertical space
-		mainPanel.add(lblHeading);
-		mainPanel.add(scrollPane);
+@Override
+public boolean isCellEditable(int row, int column) {
+return column == 5; // Only "Akcija" column editable
+}
+};
 
-		setContentPane(mainPanel);
+table = new JTable(model);
 
-	}
+// Renderer for route colors + centered text
+DefaultTableCellRenderer routeRenderer = new DefaultTableCellRenderer() {
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	// Private inner class for button rendering in the tabela cell
+@Override
+public Component getTableCellRendererComponent(JTable table, Object value,
+                                          boolean isSelected, boolean hasFocus, int row, int col) {
+Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+
+setHorizontalAlignment(SwingConstants.CENTER);
+setVerticalAlignment(SwingConstants.CENTER);
+
+
+try {
+   int routeNumber = Integer.parseInt(table.getValueAt(row, 0).toString().replace("Ruta ", ""));
+   Color[] colors = {
+       new Color(230, 240, 255),
+       new Color(255, 230, 240),
+       new Color(240, 255, 230),
+       new Color(255, 255, 200),
+       new Color(240, 200, 255)
+   };
+   c.setBackground(colors[(routeNumber - 1) % colors.length]);
+} catch (Exception e) {
+   c.setBackground(Color.WHITE);
+}
+
+return c;
+}
+};
+
+// Apply renderer to all columns
+for (int i = 0; i < table.getColumnCount(); i++) {
+table.getColumnModel().getColumn(i).setCellRenderer(routeRenderer);
+}
+
+// Button column
+table.getColumn("Akcija").setCellRenderer(new ButtonRenderer());
+table.getColumn("Akcija").setCellEditor(new ButtonEditor(new JCheckBox(), table));
+
+table.setRowHeight(30);
+}
+
+JLabel lblHeading = new JLabel("Top 5 ruta");
+lblHeading.setAlignmentX(Component.CENTER_ALIGNMENT);
+lblHeading.setFont(lblHeading.getFont().deriveFont(Font.BOLD, 24f));
+
+JPanel mainPanel = new JPanel();
+mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+JScrollPane scrollPane = new JScrollPane(table);
+scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+
+mainPanel.add(Box.createVerticalStrut(20));
+mainPanel.add(lblHeading);
+mainPanel.add(scrollPane);
+
+setContentPane(mainPanel);
+}
+
+	
+
+
+
+//	private Object[] appendHiddenColumn(String[] columns) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+
+
+
+
 	private class ButtonRenderer extends JButton implements TableCellRenderer {
 		private static final long serialVersionUID = 1L;
 
@@ -129,7 +205,7 @@ public class AdditionalRoutesFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					int row = table.getEditingRow(); // get current editing row
 					if (row >= 0) {
-						// Assuming "Polazak" is column 0 and "Dolazak" is column 1
+						
 						Object polazak = table.getValueAt(row, 0);
 						Object dolazak = table.getValueAt(row, 1);
 
@@ -151,16 +227,18 @@ public class AdditionalRoutesFrame extends JFrame {
 			return button;
 		}
 
-		//idk, ovdje moramo da promijenimo nesto da se ova vrijednost proslijedi ili idk, da se nesto pozove...
+		
 		@Override
 		public Object getCellEditorValue() {
-			//ako se klikne, uzimaju se vrijednosti iz tog reda i formira se objekat racun
-			 if (clicked) {//ovo ovdje ce isto trebati drugacije, jer nama redovi nece biti jedna ruta, n ego ce jedna ruta ici u vise redova, tako da ce ovo morati malo drugacije, dugme kupi nece morati da bude u svakom redu
-		            int row = table.getEditingRow();//ovo logika za generisanje racuna ce biti malo drugacija kod generisanja racuna one jedne rute, tj bice ista donekle sto se tice nekih info, ovdje cemo jedino mozda samo za krajnje odrednice, a tamo cemo za sve
-		            String polazak = table.getValueAt(row, 0).toString();//idk, skontati da li racun ide samo za prvu ili za pocetnu stanicu ili ne. 
-		            String odrediste = table.getValueAt(row, 1).toString();//logika za kupovinu ovuh ruta ce biti komplikovanija, jer je kupuje karta po redovima, a na glavnom prozoru imamo samo kupovinu karte za tu jednu rutu. 
+			
+			 if (clicked) {//drugacije imlementirati ovu logiku za kupovinu racuna
+		            int row = table.getEditingRow();
+		            String polazak = table.getValueAt(row, 0).toString();
+		            String odrediste = table.getValueAt(row, 1).toString();
 		            String cijena = table.getValueAt(row, 3).toString();
-		            String vrijeme = "2h 30min"; // Replace with actual time from route data
+		            String vrijeme = "2h 30min"; 
+		            
+		            
 		            
 		            Racun racun = new Racun(polazak, odrediste, cijena, vrijeme);
 		            

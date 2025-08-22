@@ -12,19 +12,19 @@ import javax.swing.JComboBox;
 import java.util.List;
 import java.util.ArrayList;
 import model.PathInfo;
-//kontroleer koji ce da kontrolise svu logiku vezanu za rute, da nije u gui i u main frame klasi
+import graph.YenKShortestPaths;
 
 /**
  * 
  */
 public class RouteController {
 
-	private TransportDataGenerator.TransportData transportData;// podaci koji ce se koristiti
+	private TransportDataGenerator.TransportData transportData;
 	private TransportGraph transportGraph;
 	private RouteFinder routeFinder;
-	private List<RouteDetails> currentRoutes; // Store current search results+
+	private List<RouteDetails> currentRoutes; 
 
-	/// ovo nam mece trebati ovo je samo za testiranje da li podaci dobro parsiraju
+	
 	private void printParsedData() {
 		if (transportData == null) {
 			System.out.println("No transport data loaded!");
@@ -50,17 +50,29 @@ public class RouteController {
 			System.out.println();
 		}
 	}
+	
+	
+	public List<RouteDetails> findTopKRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int k) {
+	    MultiGraph graph = (MultiGraph) transportGraph.buildGraph();
+	    YenKShortestPaths yen = new YenKShortestPaths(graph);
+
+	    List<PathInfo> pathInfos = yen.findTopKPaths(fromCity, toCity, criteria, k);
+
+	    return convertPathInfosToRouteDetails(pathInfos);
+	}
+
+
 
 	public RouteController(TransportDataGenerator.TransportData transportData)
 
 	{
 		this.transportData = transportData;
 		this.transportGraph = new TransportGraph(transportData);
-		// In RouteController.java line 57
+		
 		this.routeFinder = new RouteFinder((MultiGraph) transportGraph.buildGraph());
 		this.currentRoutes = new ArrayList<>();
 
-		// printParsedData();// ovdje imamo ovo za testiranje
+		// printParsedData();
 	}
 
 	/**
@@ -143,13 +155,6 @@ public class RouteController {
 	}
 	
 	
-	private List<RouteDetails> convertPathsToRouteDetails(List<org.graphstream.graph.Path> paths) {
-		List<RouteDetails> routeDetailsList = new ArrayList<>();
-		for (org.graphstream.graph.Path path : paths) {
-			routeDetailsList.add(new RouteDetails(path));
-		}
-		return routeDetailsList;
-	}
 	
 	
 
@@ -168,7 +173,7 @@ public class RouteController {
 	        System.out.println("Found " + currentRoutes.size() + " routes");
 	        for (int i = 0; i < currentRoutes.size(); i++) {
 	            RouteDetails route = currentRoutes.get(i);
-	            // ADD THE DEBUG LINE HERE:
+	            
 	            System.out.println("Route " + (i+1) + ": " + route.getFormattedTotalTime() + 
 	                             " | " + route.getFormattedTotalCost() + 
 	                             " | " + route.getTransferCount() + " transfers" +
@@ -253,6 +258,7 @@ public class RouteController {
 	}
 
 }
+
 
 
 
