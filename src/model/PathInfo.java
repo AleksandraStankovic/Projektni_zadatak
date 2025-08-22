@@ -18,7 +18,10 @@ public class PathInfo {
         
     }
 
-   
+    public PathInfo(Path path) {
+        this(path, 0, 0, 0, 0); // set other metrics to 0
+    }
+ 
     public Path getPath() { return path; }
     public int getTotalTime() { return totalTime; }
     public int getTotalCost() { return totalCost; }

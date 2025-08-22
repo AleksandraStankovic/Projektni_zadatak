@@ -53,9 +53,14 @@ public class StartupFrame extends JFrame {
 		topPanel.add(centerPanel);
 		JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 		inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+		Dimension buttonSize = new Dimension(200, 50);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 		JButton startButton = new JButton("Kreiraj matricu");
+		startButton.setBackground(new Color(30, 144, 255)); 
+		startButton.setForeground(Color.WHITE);
+		startButton.setFocusPainted(true);
+		startButton.setPreferredSize(buttonSize);
 
 		inputPanel.add(new JLabel("Broj redova:"));
 		rowsField = new JTextField("");

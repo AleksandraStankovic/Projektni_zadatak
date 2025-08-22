@@ -5,14 +5,14 @@ import model.Racun;
 import java.io.*;
 import java.nio.file.*;
 
-//neki dijelovi ovdje su definitivno okej i nece biti potrebe za puno promjena, bar u ovom dijelu. 
+
 
 public class RacunUtil {
 	
-	//ime foldera, koje je static, samo jejdno na nivou citave klase i finalno, znaci da mu nema izmjene
+	
 	  private static final String FOLDER_NAME = "racuni";
 	  
-	  //metoda za cuvanje racuna
+	  
 	  public static void sacuvajRacun(Racun racun) throws IOException//uzima racun koji ce da sacuva
 	  {
 		  //definisanje patha tj putanje za folder u koji ce se sve cuvati I guess
@@ -22,7 +22,7 @@ public class RacunUtil {
 			  Files.createDirectories(folderPath);
 		  }
 		  
-		  //definisanje ime racuna, racun + vrijeme kad je kreiran
+		 
 		  String fileName = "racun"+System.currentTimeMillis() + ".txt";
 		  Path filePath = folderPath.resolve(fileName);//spaja se putanja i ime fajla iz nekog razloga
 		  Files.write(filePath, racun.generisiRacun().getBytes());//upisicanje u fajl

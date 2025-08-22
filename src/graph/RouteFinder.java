@@ -127,39 +127,7 @@ public class RouteFinder {
         return new PathInfo(path, totalTime, totalCost, totalTransfers, distances.get(end));
     }
 
-//    /**
-//     * SIMPLIFIED method to find top routes (without complex Yen's algorithm)
-//     */
-//    public List<PathInfo> findRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int maxResults) {
-//        List<Node> startNodes = getStationsForCity(fromCity);
-//        List<Node> endNodes = getStationsForCity(toCity);
-//        
-//        List<PathInfo> allPaths = new ArrayList<>();
-//        
-//        // Find paths between all station combinations
-//        for (Node start : startNodes) {
-//            for (Node end : endNodes) {
-//                if (!start.equals(end)) {
-//                    PathInfo path = dijkstraShortestPath(start, end, criteria);
-//                    if (path != null) {
-//                        allPaths.add(path);
-//                    }
-//                }
-//            }
-//        }
-//        
-//        // Sort by the actual criteria
-//        Comparator<PathInfo> comparator = switch (criteria) {
-//            case SHORTEST_TIME -> Comparator.comparingInt(PathInfo::getTotalTime);
-//            case LOWEST_COST -> Comparator.comparingInt(PathInfo::getTotalCost);
-//            case FEWEST_TRANSFERS -> Comparator.comparingInt(PathInfo::getTotalTransfers);
-//        };
-//        
-//        return allPaths.stream()
-//                .sorted(comparator)
-//                .limit(maxResults)
-//                .collect(Collectors.toList());
-//    }
+
 
     /**
      * Get detailed path information (FIXED)
@@ -200,23 +168,5 @@ public class RouteFinder {
     /**
      * For top 5 routes requirement
      */
-//    public List<PathInfo> findTop5Routes(String fromCity, String toCity, OptimizationCriteria criteria) {
-//        return findRoutes(fromCity, toCity, criteria, 5);
-//    }
 
-//    /**
-//     * Table data for GUI
-//     */
-//    public Object[][] getPathTableData(List<PathInfo> paths) {
-//        Object[][] data = new Object[paths.size()][5];
-//        for (int i = 0; i < paths.size(); i++) {
-//            PathInfo path = paths.get(i);
-//            data[i][0] = i + 1;
-//            data[i][1] = path.getTotalTime() + " min";
-//            data[i][2] = path.getTotalCost() + " €";
-//            data[i][3] = path.getTotalTransfers();
-//            data[i][4] = "View Details";
-//        }
-//        return data;
-//    }
 }

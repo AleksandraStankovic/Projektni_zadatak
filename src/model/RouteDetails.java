@@ -9,7 +9,7 @@ public class RouteDetails {
     private int totalTime;
     private int totalCost;
     private int totalTransfers;
-    private int totalWeight;  // Add this field
+    private int totalWeight; 
     private List<RouteSegment> segments;
     
     // Constructor that accepts PathInfo

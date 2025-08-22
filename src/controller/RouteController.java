@@ -15,9 +15,7 @@ import model.PathInfo;
 import graph.YenKShortestPaths;
 import org.graphstream.graph.Node;
 
-/**
- * 
- */
+
 public class RouteController {
 
 	private TransportDataGenerator.TransportData transportData;
@@ -205,7 +203,7 @@ public class RouteController {
 	}
 
 
-
+//MOZDA IMA PROBLEM KOD UPDATEOVANJA COMBO BOXOVA, MOZDA MI NE TERBA TAKO, IDK
 
 	
 	/**

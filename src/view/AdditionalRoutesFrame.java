@@ -15,6 +15,8 @@ import model.RouteDetails;
 import controller.RouteController;
 import model.OptimizationCriteria;
 import model.RouteSegment;
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -24,32 +26,14 @@ public class AdditionalRoutesFrame extends JFrame {
 
 
     
-    
+	private List<RouteDetails> routes; // store all routes in this frame
+	private Map<Integer, RouteDetails> rowToRouteMap = new HashMap<>();
+
 	private JTable table;
     
 	String[] columns = {"Ruta", "Polazak", "Dolazak", "Tip", "Cijena" , "Akcija"}; //dodati jos kolona za ukupnu cijenu i ukupno trajanje
     
 
-//	private void updateTable(List<RouteDetails> routes) {
-//	    if (routes == null || routes.isEmpty()) {
-//	        table.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija"}));
-//	        
-//	        return;
-//	    }
-//
-//	    
-//	    Object[][] data = new Object[Math.min(5, routes.size())][4];
-//
-//	    for (int i = 0; i < Math.min(5, routes.size()); i++) {
-//	        RouteDetails route = routes.get(i);
-//	        data[i][0] = route.getFormattedTotalTime();
-//	        data[i][1] = route.getFormattedTotalCost();
-//	        data[i][2] = route.getTransferCount();
-//	    }
-//
-//	    table.setModel(new DefaultTableModel(data, columns));
-//	   
-//	}
 	
 	public AdditionalRoutesFrame(String fromCity, String toCity, OptimizationCriteria criteria,
             RouteController controller) {
@@ -82,6 +66,7 @@ data[rowIndex][2] = seg.getToStation() + (seg.getArrivalTime() != null ? " (" + 
 data[rowIndex][3] = seg.getTransportType();
 data[rowIndex][4] = seg.getFormattedPrice();
 data[rowIndex][5] = "Kupi kartu";
+rowToRouteMap.put(rowIndex, route);
 rowIndex++;
 }
 }
@@ -160,15 +145,6 @@ mainPanel.add(scrollPane);
 setContentPane(mainPanel);
 }
 
-	
-
-
-
-//	private Object[] appendHiddenColumn(String[] columns) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
 
 
 
@@ -230,30 +206,25 @@ setContentPane(mainPanel);
 		
 		@Override
 		public Object getCellEditorValue() {
-			
-			 if (clicked) {//drugacije imlementirati ovu logiku za kupovinu racuna
-		            int row = table.getEditingRow();
-		            String polazak = table.getValueAt(row, 0).toString();
-		            String odrediste = table.getValueAt(row, 1).toString();
-		            String cijena = table.getValueAt(row, 3).toString();
-		            String vrijeme = "2h 30min"; 
-		            
-		            
-		            
-		            Racun racun = new Racun(polazak, odrediste, cijena, vrijeme);
-		            
+		    if (clicked) {
+		        int row = table.getEditingRow();
+		        RouteDetails route = rowToRouteMap.get(row); // get route for this row
+		        if (route != null) {
+		            Racun racun = new Racun(route);
 		            try {
-		                RacunUtil.sacuvajRacun(racun);
-		                //JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
-		                    //"Račun je sačuvan u folderu 'racuni'.");
+		                RacunUtil.sacuvajRacun(racun); // save to file
+		                JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
+		                        racun.generisiRacun(), "Karta kupljena", JOptionPane.INFORMATION_MESSAGE);
 		            } catch (IOException e) {
 		                JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
-		                    "Greška pri čuvanju računa: " + e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
+		                        "Greška pri čuvanju računa: " + e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
+		            }
+		        }
+		    }
+		    clicked = false;
+		    return label;
 		}
-	}
-			 clicked = false;
-		        return label;
-		}
+
 
 }
 }
