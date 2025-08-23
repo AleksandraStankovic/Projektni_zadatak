@@ -107,18 +107,18 @@ public class RouteController {
 	}
 
 	
-	public void updateStartComboBox(JComboBox<String> cbPolaziste, JComboBox<String> cbOdrediste) {
-		String selectedEnd = (String) cbOdrediste.getSelectedItem();
-		String[] cities = getAllCities();
-
-		java.util.List<String> startCities = new java.util.ArrayList<>();
-		for (String c : cities) {
-			if (!c.equals(selectedEnd))
-				startCities.add(c);
-		}
-		cbPolaziste.setModel(new DefaultComboBoxModel<>(startCities.toArray(new String[0])));
-
-	}
+//	public void updateStartComboBox(JComboBox<String> cbPolaziste, JComboBox<String> cbOdrediste) {
+//		String selectedEnd = (String) cbOdrediste.getSelectedItem();
+//		String[] cities = getAllCities();
+//
+//		java.util.List<String> startCities = new java.util.ArrayList<>();
+//		for (String c : cities) {
+//			if (!c.equals(selectedEnd))
+//				startCities.add(c);
+//		}
+//		cbPolaziste.setModel(new DefaultComboBoxModel<>(startCities.toArray(new String[0])));
+//
+//	}
 
 	/**
 	 * Removes city selected in Polaziste Combo box from Odrediste Combo Box

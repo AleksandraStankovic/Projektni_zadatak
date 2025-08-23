@@ -1,9 +1,7 @@
 package model;
-//OVO SVE JE SREDJENO, MOZE SE KUPITI KARTA ZA RUTU TJ MOZE SE UPISATI U FAJL, KASNIJE JE POTREBNO DA SE OVO PREPRAVI TAKO DA RADI ZA GENERISANE RUTE I OSTALO
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import model.RouteDetails;
 import org.graphstream.graph.Node;
 import java.util.List;
 

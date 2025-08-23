@@ -1,9 +1,12 @@
 package util;
-//i guess da ovo sluzi za rad sa racunima, odnosno da uzima racun objekat i da onda radi upis u fajl
+
 
 import model.Racun;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 
 
@@ -11,7 +14,7 @@ public class RacunUtil {
 	
 	
 	  private static final String FOLDER_NAME = "racuni";
-	  
+	 
 	  
 	  public static void sacuvajRacun(Racun racun) throws IOException//uzima racun koji ce da sacuva
 	  {
@@ -29,6 +32,61 @@ public class RacunUtil {
 		  //imamo metodu za formatiranje racuna i ona se poziva nad objektom racun koji smo ovjde proslijedili, koji vraca string, a string se prosledjuje u metodu write
 		  //Ovo radi :)
 	  }
-	  
 
+	  
+	  public static Map<String, Object> ucitajStatistiku() throws IOException
+	  {
+		  
+		  Path folderPath=Paths.get(FOLDER_NAME);
+		//  Map<String, Object> stats = new HashMap<>();
+		  int brojKarata = 0; 
+		  double ukupanPrihod= 0.0;
+		  
+		  //provjera da li postoji folder sa tim imenom
+		  if(Files.exists(folderPath))
+		  {//otvara se novi stream I guess
+			  try(DirectoryStream<Path> stream = Files.newDirectoryStream(folderPath, "*.txt"))
+			  {
+				  for(Path file: stream)//za svaki fajl u steramu
+				  {
+					  brojKarata++; //poveca se broj karata cim jedan fajl pronadjemo
+					  
+					  //ucita sve linije u fajlu i trazi liniju koja pocinje sa Cijena
+					  
+					  //lista sa svim linijama 
+					  List<String> lines = Files.readAllLines(file);
+					  for(String line: lines)
+					  {
+						  if(line.startsWith("Cijena:"))
+						  {
+							  String cijenaStr = line.replace("Cijena:", "").trim();//skida prefiks cijena da samo ostane broj
+							  cijenaStr = cijenaStr.replaceAll("[^0-9.,]", "").replace(",", ".");//uklanja valutu i sve sa , mijenja sa .
+							  ukupanPrihod+=Double.parseDouble(cijenaStr);
+						  }
+					  }
+					  
+				  }
+			  }
+			
+		  }
+		  
+		  Map<String, Object> stats = new HashMap<>();
+	        stats.put("brojKarata", brojKarata);
+	        stats.put("ukupanPrihod", ukupanPrihod);
+	        return stats;
+	  }
+	  
+	  //static jer se poziva na nivou klase bez instanciranja klase tj bez objekta
+public static int getBrojKarata() throws IOException
+{
+	return (int) ucitajStatistiku().get("brojKarata");
+}
+
+public static double getUkupanPrihod() throws IOException {
+    return (double) ucitajStatistiku().get("ukupanPrihod");
+}
+
+	
+	  
+	  
 }

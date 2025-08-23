@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
 
 		controller.initializeComboBoxes(cbPolaziste, cbOdrediste);
 
-		cbOdrediste.addActionListener(e -> controller.updateStartComboBox(cbPolaziste, cbOdrediste));
+		//cbOdrediste.addActionListener(e -> controller.updateStartComboBox(cbPolaziste, cbOdrediste));
 		cbPolaziste.addActionListener(e -> controller.updateEndComboBox(cbPolaziste, cbOdrediste));
 		
 		Dimension SecondaryButtonSize = new Dimension(200, 40);

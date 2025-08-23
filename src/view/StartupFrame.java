@@ -15,15 +15,18 @@ import javax.swing.JOptionPane;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import util.RacunUtil;
+import java.io.IOException;
+
 
 public class StartupFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTextField rowsField;
 	private JTextField colsField;
-	private JLabel lblProdato;
+	private JLabel lblUkupno;
 	private JLabel lblZarada;
 
-	public StartupFrame() {
+	public StartupFrame()  {
 		setTitle("Unos dimenzija matrice");
 		setSize(400, 400);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -36,16 +39,43 @@ public class StartupFrame extends JFrame {
 		JPanel centerPanel = new JPanel();
 		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
-		lblProdato = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
-		lblProdato.setFont(lblProdato.getFont().deriveFont(Font.BOLD, 18f));
-		lblProdato.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblUkupno = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
+		lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+		lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		lblZarada = new JLabel("Ukupna zarada: 0 N.J", SwingConstants.CENTER);
 		lblZarada.setFont(lblZarada.getFont().deriveFont(Font.BOLD, 18f));
 		lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		
+		try {
+		    lblUkupno = new JLabel("Prodato karata: " + RacunUtil.getBrojKarata(), SwingConstants.CENTER);
+		    lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+		    lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
+		} catch (IOException ex) {
+		    lblUkupno = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
+		    lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+		    lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
+		    JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška", JOptionPane.ERROR_MESSAGE);
+		}
+
+		try
+		{
+			lblZarada = new JLabel("Ukupna zarada: "+RacunUtil.getUkupanPrihod() + " N.J.", SwingConstants.CENTER);
+			lblZarada.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+			lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
+		    
+		}
+		catch (IOException ex) {
+			lblZarada = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
+			lblZarada.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+			lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
+		    JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška", JOptionPane.ERROR_MESSAGE);
+		}
+		
 
 		centerPanel.add(Box.createVerticalGlue());
-		centerPanel.add(lblProdato);
+		centerPanel.add(lblUkupno);
 		centerPanel.add(Box.createVerticalStrut(10));
 		centerPanel.add(lblZarada);
 		centerPanel.add(Box.createVerticalGlue());
