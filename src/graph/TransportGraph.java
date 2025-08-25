@@ -44,17 +44,25 @@ public class TransportGraph {
 				transferEdge.setAttribute("type", "transfer");
 				transferEdge.setAttribute("minTransferTime", 5); //ovo je vrijednost za minTransferTime izmedju stanica u istom gradu
 				transferEdge.setAttribute("price", 0);
+				//transferEdge.setAttribute("arrivalTime", 5);//same as min transfer time
+				//arrivalTime bi onda trebao biti jedan min transfer timeu
+				
 				//transferEdge.setAttribute("duration", 0);//ovo ovdje mozda nije dobro!!!, mozda treba drugacije !
 				//stavicemo da je 0, da ne traje, vec samo da imamo transferTime nista vise 
 			}
 		}
 	}
 
+	
+	
 	private void addEdges() {
 		for (Departure departure : data.departures) {
 			String fromStation = departure.from;
 			String toCity = departure.to;
 			LocalTime depTime = LocalTime.parse(departure.departureTime);
+			int duration = departure.duration;
+			LocalTime arrivalTime = depTime.plusMinutes(duration);
+			
 			
 			String toStation = null;
 			for (Station station : data.stations) {
@@ -76,7 +84,8 @@ public class TransportGraph {
 						//edge.setAttribute("departureTime", departure.departureTime);
 						edge.setAttribute("departureTime", depTime); //ne mijenja puno, isto atribut, samo u drugom tipu podataka
 						edge.setAttribute("departureStr", depTime.toString()); //za printanje I guess //dodali smo samo jos jedan atribut koji predstavlja departure string zbog stampanja, da se ne mijenja ostatak koda
-						
+						//dodati ovjde jos atribut arrival time, da nam kasnije bude lakse
+						edge.setAttribute("arrivalTime", arrivalTime);
 
 						
 						edge.setAttribute("duration", departure.duration);
