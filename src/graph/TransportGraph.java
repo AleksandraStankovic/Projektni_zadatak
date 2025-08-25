@@ -6,6 +6,8 @@ import org.graphstream.graph.implementations.*;
 import generator.TransportDataGenerator;
 import generator.TransportDataGenerator.Departure;
 import generator.TransportDataGenerator.Station;
+import java.time.LocalTime;
+
 
 public class TransportGraph {
 
@@ -20,29 +22,30 @@ public class TransportGraph {
 
 	private void addNodes() {
 		for (Station station : data.stations) {
-			// Add bus station node
+			
 			Node busNode = graph.addNode(station.busStation);
 			busNode.setAttribute("ui.label", station.busStation);
 			busNode.setAttribute("ui.class", "bus");
 			busNode.setAttribute("city", station.city);
 			busNode.setAttribute("stationType", "bus");
 
-			// Add train station node
+			
 			Node trainNode = graph.addNode(station.trainStation);
 			trainNode.setAttribute("ui.label", station.trainStation);
 			trainNode.setAttribute("ui.class", "train");
 			trainNode.setAttribute("city", station.city);
 			trainNode.setAttribute("stationType", "train");
 
-			// Add transfer edge between bus and train stations
+			
 			String transferEdgeId = station.busStation + "-" + station.trainStation;
 			if (graph.getEdge(transferEdgeId) == null) {
 				Edge transferEdge = graph.addEdge(transferEdgeId, station.busStation, station.trainStation, true);
 				transferEdge.setAttribute("ui.class", "transfer");
 				transferEdge.setAttribute("type", "transfer");
-				transferEdge.setAttribute("minTransferTime", 5);
+				transferEdge.setAttribute("minTransferTime", 5); //ovo je vrijednost za minTransferTime izmedju stanica u istom gradu
 				transferEdge.setAttribute("price", 0);
-				transferEdge.setAttribute("duration", 5);
+				//transferEdge.setAttribute("duration", 0);//ovo ovdje mozda nije dobro!!!, mozda treba drugacije !
+				//stavicemo da je 0, da ne traje, vec samo da imamo transferTime nista vise 
 			}
 		}
 	}
@@ -51,8 +54,8 @@ public class TransportGraph {
 		for (Departure departure : data.departures) {
 			String fromStation = departure.from;
 			String toCity = departure.to;
-
-			// Find the corresponding target station
+			LocalTime depTime = LocalTime.parse(departure.departureTime);
+			
 			String toStation = null;
 			for (Station station : data.stations) {
 				if (station.city.equals(toCity)) {
@@ -70,10 +73,15 @@ public class TransportGraph {
 
 						// Set all required attributes
 						edge.setAttribute("type", departure.type);
-						edge.setAttribute("departureTime", departure.departureTime);
+						//edge.setAttribute("departureTime", departure.departureTime);
+						edge.setAttribute("departureTime", depTime); //ne mijenja puno, isto atribut, samo u drugom tipu podataka
+						edge.setAttribute("departureStr", depTime.toString()); //za printanje I guess //dodali smo samo jos jedan atribut koji predstavlja departure string zbog stampanja, da se ne mijenja ostatak koda
+						
+
+						
 						edge.setAttribute("duration", departure.duration);
 						edge.setAttribute("price", departure.price);
-						edge.setAttribute("minTransferTime", departure.minTransferTime);
+						edge.setAttribute("minTransferTime", departure.minTransferTime);//minTransferTime u edgu koji povezuje stanice u različitin gradovima
 
 						// Set UI class based on transport type
 						String uiClass = departure.type.equals("autobus") ? "autobus" : "voz";
@@ -115,16 +123,16 @@ public class TransportGraph {
 		addEdges();
 		styleGraph();
 
-		// Debug: Print graph statistics using basic methods
+		//ovo dole kasnije i nece trebati jer je samo stampanje
 		System.out.println("Graph built successfully:");
 		System.out.println("  Nodes: " + graph.getNodeCount());
 		System.out.println("  Edges: " + graph.getEdgeCount());
 
-		// Count edges using the most basic approach
+		
 		int transferEdges = 0;
 		int transportEdges = 0;
 
-		// Use getEdge(i) method which should be available in all versions
+		
 		for (int i = 0; i < graph.getEdgeCount(); i++) {
 			Edge edge = graph.getEdge(i);
 			String type = (String) edge.getAttribute("type");
@@ -141,18 +149,18 @@ public class TransportGraph {
 		return graph;
 	}
 
-	// Helper method for debugging using basic methods
+	
 	public void printGraphInfo() {
 		System.out.println("=== GRAPH INFO ===");
 
-		// Print nodes using getNode(i)
+		
 		for (int i = 0; i < graph.getNodeCount(); i++) {
 			Node node = graph.getNode(i);
 			System.out.println("Node: " + node.getId() + ", City: " + node.getAttribute("city") + ", Type: "
 					+ node.getAttribute("stationType"));
 		}
 
-		// Print edges using getEdge(i)
+		
 		for (int i = 0; i < graph.getEdgeCount(); i++) {
 			Edge edge = graph.getEdge(i);
 			System.out.println("Edge: " + edge.getId() + ", Type: " + edge.getAttribute("type") + ", From: "

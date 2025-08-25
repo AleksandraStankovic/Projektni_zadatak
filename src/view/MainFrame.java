@@ -222,13 +222,12 @@ public class MainFrame extends JFrame {
 			
 			  Racun racun = new Racun(this.lastBestRoute);
 			  try {
-			        // Create the receipt
-			       // Racun racun = new Racun(this.lastBestRoute);
+			      
 			        
 			        // Save it using RacunUtil
 			        RacunUtil.sacuvajRacun(racun);
 
-			        // Optionally, show confirmation with the receipt
+			   
 			        JOptionPane.showMessageDialog(this, 
 			            "Račun je generisan i sačuvan.\n\n" + racun.generisiRacun(), 
 			            "Karta kupljena", 
@@ -267,7 +266,7 @@ public class MainFrame extends JFrame {
 		centerPanel.add(tablePanel, BorderLayout.NORTH);
 		
 		
-		// Panel for buttons with background color
+		
 		JPanel graphButtonsPanel = new JPanel(new GridBagLayout()) {
 		    /**
 			 * 
@@ -306,7 +305,7 @@ public class MainFrame extends JFrame {
 
 		Dimension buttonSize = new Dimension(200, 50);
 
-		Font buttonFont = new Font("Arial", Font.BOLD, 16);//idk, dodati ovo myb u posebnu neku metodu idk....
+		Font buttonFont = new Font("Arial", Font.BOLD, 16);
 
 		btnPrikaziGraf.setPreferredSize(buttonSize);
 		btnPrikaziGraf.setFont(buttonFont);

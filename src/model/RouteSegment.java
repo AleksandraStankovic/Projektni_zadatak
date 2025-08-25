@@ -51,7 +51,7 @@ public class RouteSegment {
     }
     
     public String getFormattedPrice() {
-        return price + " n.j";
+        return price + " n.j.";
     }
 }
 

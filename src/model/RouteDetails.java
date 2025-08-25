@@ -30,7 +30,10 @@ public class RouteDetails {
                 String type = edge.getAttribute("type") != null ? (String) edge.getAttribute("type") : "Unknown";
                 int duration = edge.getAttribute("duration") != null ? (int) edge.getAttribute("duration") : 0;
                 int price = edge.getAttribute("price") != null ? (int) edge.getAttribute("price") : 0;
-                String departure = edge.getAttribute("departureTime") != null ? (String) edge.getAttribute("departureTime") : null;
+                String departure = edge.getAttribute("departureStr") != null ? (String) edge.getAttribute("departureStr") : null; //ovo nije mozda najbolje, pogledati jos jednom zbog ovog null
+                
+
+                
 
                 RouteSegment segment = new RouteSegment();
                 segment.setFromStation(from);
