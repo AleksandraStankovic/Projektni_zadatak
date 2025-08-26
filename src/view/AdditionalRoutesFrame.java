@@ -33,7 +33,7 @@ public class AdditionalRoutesFrame extends JFrame {
     
 	String[] columns = {"Ruta", "Polazak", "Dolazak", "Tip", "Cijena" , "Akcija"}; //dodati jos kolona za ukupnu cijenu i ukupno trajanje
     
-
+//ovdje treba bolje uraditi da se vidi sumarna ruta i cijena i da se samo tu nalazi dugme kupi 
 	
 	public AdditionalRoutesFrame(String fromCity, String toCity, OptimizationCriteria criteria,
             RouteController controller) {

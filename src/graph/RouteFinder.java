@@ -102,6 +102,10 @@ public class RouteFinder {
 	          
 	           LocalTime prevEarliest;
 	           LocalTime startDepartureTime = LocalTime.of(8, 0); // 8:00 AM
+	           //isto tako je moguće i da se krene od 00:00
+	           //LocalTime startDepartureTime = LocalTime.now(); // ovako je ako želimo da krenemo od sadašnjeg trenutka 
+	          //System.out.println("time now: "+startDepartureTime);
+
 	           
 	           LocalTime earliestDepartureTime = startDepartureTime;
 		    
