@@ -26,7 +26,7 @@ public class AdditionalRoutesFrame extends JFrame {
 
 
     
-	private List<RouteDetails> routes; // store all routes in this frame
+	//private List<RouteDetails> routes; // store all routes in this frame
 	private Map<Integer, RouteDetails> rowToRouteMap = new HashMap<>();
 
 	private JTable table;

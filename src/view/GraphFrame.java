@@ -1,13 +1,17 @@
 package view;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import java.awt.*;
+
+
 
 import graph.TransportGraph;
 
 public class GraphFrame extends JFrame {
+	 /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	 private GraphPanel graphPanel;
 	// konstruktor
 	 public GraphFrame(TransportGraph graph) {

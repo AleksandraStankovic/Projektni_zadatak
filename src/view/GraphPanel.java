@@ -2,13 +2,12 @@ package view;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import org.graphstream.graph.Graph;
+
 import org.graphstream.graph.Edge;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.Path;
+
 import org.graphstream.graph.implementations.MultiGraph;
 import model.PathInfo;
-import java.util.Iterator;
+
 
 
 import org.graphstream.ui.swing_viewer.SwingViewer;

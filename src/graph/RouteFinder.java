@@ -117,6 +117,10 @@ public class RouteFinder {
 	
 
 		           
+		           if (currentNode.equals(end)) break;
+		           if (current.distance > distances.get(currentNode)) continue;
+		           //ovo treba na vrh
+		           
 		           
 		           //PIGLEDATI JOS JENDOM OVU LOGIKU I KRAJNJE SLUCAJEVE 
 		           
@@ -152,55 +156,98 @@ public class RouteFinder {
 
 			    	   
 	
-		          
-		           if (currentNode.equals(end)) break;
-		           if (current.distance > distances.get(currentNode)) continue;
-		           //ovo treba na vrh
+		     
 		           
 		           
 		           
 		           //zelimo da iz noda koji sad gledamo saznamo kad se doslo u njega tacno, na sta cemo da dodamo minTransferTime isto iz tog edga
 		          
-		           for (Edge edge : currentNode.leavingEdges().toArray(Edge[]::new)) { //sad gledamo edges koji su naredni i ovdje treba da uklonimo edges koji ne odg po dept timeu
-		               Node neighbor = edge.getTargetNode();
-		               int weight = getEdgeWeight(edge, criteria);
-		               int newDistance = distances.get(currentNode) + weight;
-		               LocalTime deptTime =(LocalTime) edge.getAttribute("departureTime");
-		             
-		               
-		         //imamo dept time
-		              
-		               
-		               //OVAJ DIO SA PROVJERAMA JE OKEJ, SAMO MORAMO IMPLEMENTIRATI DA SE I PRESKACE ONO STO TREBA DA SE PRESKOCI I GUESS
-		               
-		               //sad moramo da provjerimo da li je za ovaj edge dept time poslije najranijeg moguceg dept timea za node koji trenutno gledamo
-		            // Add null check before comparing
-		               if (deptTime != null) {
-		                   if(deptTime.isBefore(earliestDepartureTime)) {
-		                       System.out.println("Edge: "+edge);
-		                       System.out.println("Departure time: " + deptTime);
-		                       System.out.println("earliest departure time for node "+currentNode+" is "+earliestDepartureTime);
-		                       System.out.println("dept time je prije moguceg polaska. ");
-		                   }
-		               } else {
-		                   System.out.println("Edge " + edge.getId() + " has no departure time, skipping time check");
-		                   // Handle edges without departure time appropriately
-		                   // Maybe skip this edge or use a different logic
-		                   
-		               }
-		            	   
-	
-		             
-		               
-	
-		              
-		               if (newDistance < distances.get(neighbor)) {
-		                   distances.put(neighbor, newDistance);
-		                   previousNodes.put(neighbor, currentNode);
-		                   previousEdges.put(neighbor, edge);
-		                   queue.add(new NodeDistance(neighbor, newDistance));
-		               }
-		           }
+//		           for (Edge edge : currentNode.leavingEdges().toArray(Edge[]::new)) { //sad gledamo edges koji su naredni i ovdje treba da uklonimo edges koji ne odg po dept timeu
+//		               Node neighbor = edge.getTargetNode();
+//		               int weight = getEdgeWeight(edge, criteria);
+//		               int newDistance = distances.get(currentNode) + weight;
+//		               LocalTime deptTime =(LocalTime) edge.getAttribute("departureTime");
+//		             
+//		               
+//		         //imamo dept time
+//		              
+//		               
+//		               //OVAJ DIO SA PROVJERAMA JE OKEJ, SAMO MORAMO IMPLEMENTIRATI DA SE I PRESKACE ONO STO TREBA DA SE PRESKOCI I GUESS
+//		               
+//		               //sad moramo da provjerimo da li je za ovaj edge dept time poslije najranijeg moguceg dept timea za node koji trenutno gledamo
+//		            // Add null check before comparing
+//		               if (deptTime != null) {
+//		                   if(deptTime.isBefore(earliestDepartureTime)) {
+//		                       System.out.println("Edge: "+edge);
+//		                       System.out.println("Departure time: " + deptTime);
+//		                       System.out.println("earliest departure time for node "+currentNode+" is "+earliestDepartureTime);
+//		                       System.out.println("dept time je prije moguceg polaska. ");
+//		                       System.out.println("preskačemo ovu granu. ");
+//		                       continue;
+//		                   }
+//		               } else {
+//		                   System.out.println("Edge " + edge.getId() + " has no departure time, skipping time check");
+//		                   System.out.println("ne preskačemo ovu granu. ");
+//		                   // Handle edges without departure time appropriately
+//		                   // Maybe skip this edge or use a different logic
+//		                   
+//		               }
+//		            	   
+//	
+//		             
+//		               
+//	
+//		              
+//		               if (newDistance < distances.get(neighbor)) {
+//		                   distances.put(neighbor, newDistance);
+//		                   previousNodes.put(neighbor, currentNode);
+//		                   previousEdges.put(neighbor, edge);
+//		                   queue.add(new NodeDistance(neighbor, newDistance));
+//		               }
+//		           }
+		           
+		           for (Edge edge : currentNode.leavingEdges().toArray(Edge[]::new)) {
+		        	    Node neighbor = edge.getTargetNode();
+		        	    int weight = getEdgeWeight(edge, criteria);
+		        	    int newDistance = distances.get(currentNode) + weight;
+
+		        	    // Departure time of this edge
+		        	    LocalTime deptTime = (LocalTime) edge.getAttribute("departureTime");
+
+		        	    // Calculate the earliest time you can actually leave *this edge*
+		        	    LocalTime earliestForThisEdge = arrivalTimes.getOrDefault(currentNode, startDepartureTime);
+
+		        	    // If edge has a transfer requirement, add it
+		        	    Integer minTransfer = (Integer) edge.getAttribute("minTransferTime");
+		        	    if (minTransfer != null) {
+		        	        earliestForThisEdge = earliestForThisEdge.plusMinutes(minTransfer);
+		        	    }
+
+		        	    // If this edge departs before we are ready -> skip it
+		        	    if (deptTime != null && deptTime.isBefore(earliestForThisEdge)) {
+		        	        System.out.println("Skipping edge " + edge.getId() +
+		        	                           " (dep " + deptTime + " < earliest " + earliestForThisEdge + ")");
+		        	        continue;
+		        	    }
+
+		        	    // If we use this edge, record arrival time at the neighbor
+		        	    LocalTime arrTime = (LocalTime) edge.getAttribute("arrivalTime");
+		        	    if (arrTime != null) {
+		        	        arrivalTimes.put(neighbor, arrTime);
+		        	    }
+
+		        	    // Standard Dijkstra relaxation
+		        	    if (newDistance < distances.get(neighbor)) {
+		        	        distances.put(neighbor, newDistance);
+		        	        previousNodes.put(neighbor, currentNode);
+		        	        previousEdges.put(neighbor, edge);
+		        	        queue.add(new NodeDistance(neighbor, newDistance));
+		        	    }
+		        	}
+
+		           
+		           
+		           
 		       }
 		      
 		       if (distances.get(end) == Integer.MAX_VALUE) return null;
