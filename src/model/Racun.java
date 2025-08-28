@@ -9,8 +9,8 @@ public class Racun {
 
 
 
-	private String polazak; // odnosi se na polaznu stanicu
-	private String odrediste; // krajnja stanica (da li se odnori na grad ili na sta=?
+	private String polazak; 
+	private String odrediste;
 	
 	private String cijena;
 	private String vrijemePutovanja;
@@ -19,7 +19,7 @@ public class Racun {
 	private String getFirstCityName(RouteDetails route)
 	{
 		List<Node> nodes = route.getPath().getNodePath();
-		//String foCity; 
+		
 
 		if (!nodes.isEmpty()) {
 		    Node firstNode = nodes.get(0);
@@ -52,14 +52,12 @@ public class Racun {
 	}
 	
 
-	//ovo treba da primi nesto drugo, vjerovatno da primi best route sto pronadje
 	public Racun(RouteDetails route) {
-		this.polazak = this.getFirstCityName(route); // koristi se this ako su ime parametra i ime atributa isti
+		this.polazak = this.getFirstCityName(route); 
 		this.odrediste = this.getLastCityName(route);
 		this.cijena = route.getFormattedTotalCost();
 		this.vrijemePutovanja = route.getFormattedTotalTime();
-		this.datumKupovine = LocalDateTime.now();// uzima se trenutno vrijeme kupovine
-		//mozda se moze jos negdje dodati neko formatiranje nesto, ali je bolje da ne? 
+		this.datumKupovine = LocalDateTime.now(); 
 
 	}
 
@@ -67,7 +65,7 @@ public class Racun {
 	
 	public String generisiRacun()
 	{
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");//formatiranje datuma
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 		return String.format(
 			    "Relacija: %s → %s\n" +
 			    "Vrijeme putovanja: %s\n" +

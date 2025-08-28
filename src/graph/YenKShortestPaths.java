@@ -142,22 +142,5 @@ public class YenKShortestPaths {
         }
     }
     
-    
- // Add this method at the bottom of your YenKShortestPaths class
-    public void runDebugExample() {
-        // Pick two cities for testing — make sure these exist in your graph
-        String fromCity = "CityA";
-        String toCity = "CityB";
-        
-        // Choose criteria and number of paths
-        OptimizationCriteria criteria = OptimizationCriteria.SHORTEST_TIME;
-        int K = 5;
-        
-        // Call your main algorithm
-        List<PathInfo> paths = findTopKPaths(fromCity, toCity, criteria, K);
-        
-        // Print paths using your debug method
-        debugPrintPaths(paths, criteria);
-    }
 
 }

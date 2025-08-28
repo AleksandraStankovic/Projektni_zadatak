@@ -11,7 +11,7 @@ public class TransportDataGenerator {
 	private static final int DEPARTURES_PER_STATION = 5;
 	private static final Random random = new Random();
 
-	// Setter methods for rows and cols
+	
 	public static void setDimensions(int rows, int cols) {
 		if (rows <= 0 || cols <= 0) {
 			throw new IllegalArgumentException("Dimenzije moraju biti pozitivni cijeli brojevi. ");
@@ -33,22 +33,17 @@ public class TransportDataGenerator {
 		}
 	}
 
-	// ovdje mi se nalazi main, tako da odavde ide ucitavanje pocetnogg prozora
-	// i guess da ovo radi, pogledati sutra tacno da li je dobro i kako tacno
-	// funkcionise
+
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(() -> {
 			StartupFrame sFrame = new StartupFrame();
 			sFrame.setVisible(true);
 		});
 
-//        TransportDataGenerator generator = new TransportDataGenerator();//ovdje moramo drugacije da definisemo tj da dodamo arguemente ovdje preko nekog od prozora
-//        TransportData data = generator.generateData();
-//        generator.saveToJson(data, "transport_data.json");
-//        System.out.println("Podaci su generisani i sacuvani kao transport_data.json");
+
 	}
 
-	// struktura podataka koja sadrzi sve trazene ulazne podatke
+
 	public static class TransportData {
 		public String[][] countryMap;
 		public List<Station> stations;

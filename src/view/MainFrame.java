@@ -41,7 +41,6 @@ public class MainFrame extends JFrame {
 	private JLabel lblUkupno;
 	private JTable table;
 	private RouteDetails lastBestRoute;
-	//private Racun racun; 
 
 
 	private RouteController controller;
@@ -103,33 +102,27 @@ public class MainFrame extends JFrame {
 
 		controller.initializeComboBoxes(cbPolaziste, cbOdrediste);
 
-		//cbOdrediste.addActionListener(e -> controller.updateStartComboBox(cbPolaziste, cbOdrediste));
 		cbPolaziste.addActionListener(e -> controller.updateEndComboBox(cbPolaziste, cbOdrediste));
-		
+
 		Dimension SecondaryButtonSize = new Dimension(200, 40);
 
 		JButton btnPronadji = new JButton("Pronađi rutu");
-		btnPronadji.setBackground(new Color(30, 144, 255)); 
+		btnPronadji.setBackground(new Color(30, 144, 255));
 		btnPronadji.setForeground(Color.WHITE);
 		btnPronadji.setFocusPainted(false);
 		btnPronadji.setPreferredSize(SecondaryButtonSize);
 
-		
-		
 		JButton btnDodatneRute = new JButton("Prikaži dodatne rute");
-		btnDodatneRute.setBackground(new Color(139, 195, 74)); 
+		btnDodatneRute.setBackground(new Color(139, 195, 74));
 		btnDodatneRute.setForeground(Color.WHITE);
 		btnDodatneRute.setFocusPainted(true);
 
 		JButton btnKupi = new JButton("Kupovina karte");
-		btnKupi.setBackground(new Color(139, 195, 74)); 
+		btnKupi.setBackground(new Color(139, 195, 74));
 		btnKupi.setForeground(Color.WHITE);
 		btnKupi.setFocusPainted(true);
 		btnDodatneRute.setPreferredSize(SecondaryButtonSize);
 		btnKupi.setPreferredSize(SecondaryButtonSize);
-		
-		
-		
 
 		JPanel topFormPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topFormPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0),
@@ -166,12 +159,10 @@ public class MainFrame extends JFrame {
 
 		});
 
-		
 		btnPronadji.addActionListener(e -> {
 			String fromCity = (String) cbPolaziste.getSelectedItem();
 			String toCity = (String) cbOdrediste.getSelectedItem();
 			String selectedCriteria = (String) cbKriterijum.getSelectedItem();
-			
 
 			OptimizationCriteria criteria = controller.getCriteriaFromDisplayText(selectedCriteria);
 
@@ -182,7 +173,7 @@ public class MainFrame extends JFrame {
 			}
 
 			RouteDetails bestRoute = controller.findBestRoute(fromCity, toCity, criteria);
-			this.lastBestRoute = bestRoute;//best route moramo da proslijedimo u evenet handler za kupovinu karte
+			this.lastBestRoute = bestRoute;
 
 			if (bestRoute == null) {
 				JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih gradova.", "Informacija",
@@ -191,63 +182,46 @@ public class MainFrame extends JFrame {
 				lblUkupno.setText("Nema dostupnih ruta između " + fromCity + " i " + toCity);
 			} else {
 				updateTable(bestRoute);
-				
-				
-				  GraphFrame graphFrame = new GraphFrame(transportGraph);
-				    graphFrame.getGraphPanel().highlightPath(new PathInfo(bestRoute.getPath()));
-				    graphFrame.setVisible(true);
+
+				GraphFrame graphFrame = new GraphFrame(transportGraph);
+				graphFrame.getGraphPanel().highlightPath(new PathInfo(bestRoute.getPath()));
+				graphFrame.setVisible(true);
 			}
 		});
-		
-		
-	JButton btnPrikaziGraf = new JButton("Prikaži graf");
-		
-		btnPrikaziGraf.addActionListener (e->
-		{
-			GraphFrame graphFrame = new GraphFrame(transportGraph);//prosledjujemo graf
+
+		JButton btnPrikaziGraf = new JButton("Prikaži graf");
+
+		btnPrikaziGraf.addActionListener(e -> {
+			GraphFrame graphFrame = new GraphFrame(transportGraph);// prosledjujemo graf
 			graphFrame.setVisible(true);
-		}
-		);
-		
-		
-		btnKupi.addActionListener(e->
-		{
+		});
+
+		btnKupi.addActionListener(e -> {
 			if (lastBestRoute == null) {
-		        JOptionPane.showMessageDialog(this, 
-		            "Prvo pronađite rutu za koju želite kupiti kartu.", 
-		            "Greška", 
-		            JOptionPane.ERROR_MESSAGE);
-		        return;
-		    }
-			
-			  Racun racun = new Racun(this.lastBestRoute);
-			  try {
-			      
-			        
-			        // Save it using RacunUtil
-			        RacunUtil.sacuvajRacun(racun);
+				JOptionPane.showMessageDialog(this, "Prvo pronađite rutu za koju želite kupiti kartu.", "Greška",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 
-			   
-			        JOptionPane.showMessageDialog(this, 
-			            "Račun je generisan i sačuvan.\n\n" + racun.generisiRacun(), 
-			            "Karta kupljena", 
-			            JOptionPane.INFORMATION_MESSAGE);
+			Racun racun = new Racun(this.lastBestRoute);
+			try {
 
-			    } catch (IOException ex) {
-			        JOptionPane.showMessageDialog(this, 
-			            "Greška pri čuvanju računa: " + ex.getMessage(), 
-			            "Greška", 
-			            JOptionPane.ERROR_MESSAGE);
-			    }
-			  
+				
+				RacunUtil.sacuvajRacun(racun);
 
-			  
-			  
+				JOptionPane.showMessageDialog(this, "Račun je generisan i sačuvan.\n\n" + racun.generisiRacun(),
+						"Karta kupljena", JOptionPane.INFORMATION_MESSAGE);
+
+			} catch (IOException ex) {
+				JOptionPane.showMessageDialog(this, "Greška pri čuvanju računa: " + ex.getMessage(), "Greška",
+						JOptionPane.ERROR_MESSAGE);
+			}
+
 		}
-		
+
 		);
 
-;
+		;
 
 		JScrollPane tableScroll = new JScrollPane(table);
 		tableScroll.setPreferredSize(new Dimension(0, 200));
@@ -264,32 +238,27 @@ public class MainFrame extends JFrame {
 
 		tablePanel.add(labelContainer, BorderLayout.SOUTH);
 		centerPanel.add(tablePanel, BorderLayout.NORTH);
-		
-		
-		
+
 		JPanel graphButtonsPanel = new JPanel(new GridBagLayout()) {
-		    /**
+			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
-			private Image backgroundImage = new ImageIcon(
-				    getClass().getResource("/resources/background.jpg")
-				).getImage();
+			private Image backgroundImage = new ImageIcon(getClass().getResource("/resources/background.jpg"))
+					.getImage();
 
-		    // 🔼 adjust the path to your image file
+			
 
-		    @Override
-		    protected void paintComponent(Graphics g) {
-		        super.paintComponent(g);
-		        // Draw image scaled to panel size
-		        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-		    }
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				
+				g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+			}
 		};
-		
-		graphButtonsPanel.setOpaque(false); 
-		
-		
-		
+
+		graphButtonsPanel.setOpaque(false);
+
 		graphButtonsPanel.setBackground(new Color(220, 220, 220));
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -300,7 +269,7 @@ public class MainFrame extends JFrame {
 		graphButtonsPanel.add(btnPrikaziGraf, gbc);
 
 		gbc.gridy = 1;
-		
+
 		centerPanel.add(graphButtonsPanel, BorderLayout.CENTER);
 
 		Dimension buttonSize = new Dimension(200, 50);
@@ -309,12 +278,9 @@ public class MainFrame extends JFrame {
 
 		btnPrikaziGraf.setPreferredSize(buttonSize);
 		btnPrikaziGraf.setFont(buttonFont);
-		btnPrikaziGraf.setBackground(new Color(30, 144, 255)); 
+		btnPrikaziGraf.setBackground(new Color(30, 144, 255));
 		btnPrikaziGraf.setForeground(Color.WHITE);
 		btnPrikaziGraf.setFocusPainted(false);
-
-	
-
 
 		JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 200, 10));
 		bottomPanel.add(btnDodatneRute);

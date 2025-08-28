@@ -12,25 +12,25 @@ public class RouteDetails {
     private int totalWeight; 
     private List<RouteSegment> segments;
     
-    // Constructor that accepts PathInfo
+
     public RouteDetails(PathInfo pathInfo) {
         this.path = pathInfo.getPath();
         this.totalTime = pathInfo.getTotalTime();
         this.totalCost = pathInfo.getTotalCost();
         this.totalTransfers = pathInfo.getTotalTransfers();
-        this.segments = new ArrayList<>(); // Empty segments for now
-        this.totalWeight = pathInfo.getTotalWeight();  // Add this
+        this.segments = new ArrayList<>(); 
+        this.totalWeight = pathInfo.getTotalWeight(); 
         
         
         if (path != null) {
-            // Iterate over edges in the path
+            
             path.getEdgeSet().forEach(edge -> {
                 String from = edge.getSourceNode().getId();
                 String to = edge.getTargetNode().getId();
                 String type = edge.getAttribute("type") != null ? (String) edge.getAttribute("type") : "Unknown";
                 int duration = edge.getAttribute("duration") != null ? (int) edge.getAttribute("duration") : 0;
                 int price = edge.getAttribute("price") != null ? (int) edge.getAttribute("price") : 0;
-                String departure = edge.getAttribute("departureStr") != null ? (String) edge.getAttribute("departureStr") : null; //ovo nije mozda najbolje, pogledati jos jednom zbog ovog null
+                String departure = edge.getAttribute("departureStr") != null ? (String) edge.getAttribute("departureStr") : null; 
                 
 
                 
@@ -43,7 +43,7 @@ public class RouteDetails {
                 segment.setPrice(price);
                 segment.setDepartureTime(departure);
 
-                // Compute arrivalTime if departure is present
+                
                 if (departure != null) {
                     String[] parts = departure.split(":");
                     int depHour = Integer.parseInt(parts[0]);
