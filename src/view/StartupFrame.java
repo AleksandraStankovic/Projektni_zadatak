@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import util.RacunUtil;
 import java.io.IOException;
 
-
 public class StartupFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTextField rowsField;
@@ -26,7 +25,7 @@ public class StartupFrame extends JFrame {
 	private JLabel lblUkupno;
 	private JLabel lblZarada;
 
-	public StartupFrame()  {
+	public StartupFrame() {
 		setTitle("Unos dimenzija matrice");
 		setSize(400, 400);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,33 +45,31 @@ public class StartupFrame extends JFrame {
 		lblZarada = new JLabel("Ukupna zarada: 0 N.J", SwingConstants.CENTER);
 		lblZarada.setFont(lblZarada.getFont().deriveFont(Font.BOLD, 18f));
 		lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		
+
 		try {
-		    lblUkupno = new JLabel("Prodato karata: " + RacunUtil.getBrojKarata(), SwingConstants.CENTER);
-		    lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
-		    lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
+			lblUkupno = new JLabel("Prodato karata: " + RacunUtil.getBrojKarata(), SwingConstants.CENTER);
+			lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+			lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
 		} catch (IOException ex) {
-		    lblUkupno = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
-		    lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
-		    lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
-		    JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška", JOptionPane.ERROR_MESSAGE);
+			lblUkupno = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
+			lblUkupno.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
+			lblUkupno.setAlignmentX(Component.CENTER_ALIGNMENT);
+			JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
-		try
-		{
-			lblZarada = new JLabel("Ukupna zarada: "+RacunUtil.getUkupanPrihod() + " N.J.", SwingConstants.CENTER);
+		try {
+			lblZarada = new JLabel("Ukupna zarada: " + RacunUtil.getUkupanPrihod() + " N.J.", SwingConstants.CENTER);
 			lblZarada.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
 			lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
-		    
-		}
-		catch (IOException ex) {
+
+		} catch (IOException ex) {
 			lblZarada = new JLabel("Prodato karata: 0", SwingConstants.CENTER);
 			lblZarada.setFont(lblUkupno.getFont().deriveFont(Font.BOLD, 18f));
 			lblZarada.setAlignmentX(Component.CENTER_ALIGNMENT);
-		    JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Greška pri učitavanju statistike karata", "I/O Greška",
+					JOptionPane.ERROR_MESSAGE);
 		}
-		
 
 		centerPanel.add(Box.createVerticalGlue());
 		centerPanel.add(lblUkupno);
@@ -87,7 +84,7 @@ public class StartupFrame extends JFrame {
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 		JButton startButton = new JButton("Kreiraj matricu");
-		startButton.setBackground(new Color(30, 144, 255)); 
+		startButton.setBackground(new Color(30, 144, 255));
 		startButton.setForeground(Color.WHITE);
 		startButton.setFocusPainted(true);
 		startButton.setPreferredSize(buttonSize);
@@ -107,7 +104,7 @@ public class StartupFrame extends JFrame {
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-														
+
 				try {
 					int rows = Integer.parseInt(rowsField.getText());
 					int cols = Integer.parseInt(colsField.getText());

@@ -42,7 +42,6 @@ public class MainFrame extends JFrame {
 	private JTable table;
 	private RouteDetails lastBestRoute;
 
-
 	private RouteController controller;
 
 	String[] columns = { "Polazak", "Dolazak", "Tip", "Cijena" };
@@ -206,7 +205,6 @@ public class MainFrame extends JFrame {
 			Racun racun = new Racun(this.lastBestRoute);
 			try {
 
-				
 				RacunUtil.sacuvajRacun(racun);
 
 				JOptionPane.showMessageDialog(this, "Račun je generisan i sačuvan.\n\n" + racun.generisiRacun(),
@@ -247,12 +245,10 @@ public class MainFrame extends JFrame {
 			private Image backgroundImage = new ImageIcon(getClass().getResource("/resources/background.jpg"))
 					.getImage();
 
-			
-
 			@Override
 			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
-				
+
 				g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 			}
 		};
