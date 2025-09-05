@@ -4,7 +4,10 @@ import view.StartupFrame;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
+//import model.Station;
+//import model.BusStation;
+//import model.TrainStation;
+ 
 public class TransportDataGenerator {
 	private static int rows;
 	private static int cols;
@@ -90,10 +93,18 @@ public class TransportDataGenerator {
 		List<Station> stations = new ArrayList<>();
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < cols; y++) {
+				String city = "G_" + x + "_" + y; 
 				Station station = new Station();
 				station.city = "G_" + x + "_" + y;
 				station.busStation = "A_" + x + "_" + y;
 				station.trainStation = "Z_" + x + "_" + y;
+				
+//				   BusStation bus = new BusStation(city, "A_" + x + "_" + y);
+//		            TrainStation train = new TrainStation(city, "Z_" + x + "_" + y);
+//
+//		            stations.add(bus);
+//		            stations.add(train);
+		            
 				stations.add(station);
 			}
 		}

@@ -22,33 +22,6 @@ public class RouteController {
 	private TransportGraph transportGraph;
 	private RouteFinder routeFinder;
 	private List<RouteDetails> currentRoutes; 
-
-	
-	private void printParsedData() {
-		if (transportData == null) {
-			System.out.println("No transport data loaded!");
-			return;
-		}
-
-		System.out.println("=== Stations ===");
-		for (TransportDataGenerator.Station s : transportData.stations) {
-			System.out.println("City: " + s.city + ", Bus: " + s.busStation + ", Train: " + s.trainStation);
-		}
-
-		System.out.println("\n=== Departures ===");
-		for (TransportDataGenerator.Departure d : transportData.departures) {
-			System.out.println(d.type + " | From: " + d.from + " | To: " + d.to + " | Time: " + d.departureTime
-					+ " | Duration: " + d.duration + " | Price: " + d.price + " | MinTransfer: " + d.minTransferTime);
-		}
-
-		System.out.println("\n=== Country Map ===");
-		for (int i = 0; i < transportData.countryMap.length; i++) {
-			for (int j = 0; j < transportData.countryMap[i].length; j++) {
-				System.out.print(transportData.countryMap[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
 	
 	
 	public List<RouteDetails> findTopKRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int k) {

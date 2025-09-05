@@ -6,6 +6,10 @@ import org.graphstream.graph.implementations.*;
 import generator.TransportDataGenerator;
 import generator.TransportDataGenerator.Departure;
 import generator.TransportDataGenerator.Station;
+//import model.Station;
+//import model.BusStation;
+//import model.TrainStation;
+
 import java.time.LocalTime;
 
 
@@ -21,21 +25,22 @@ public class TransportGraph {
 	}
 
 	private void addNodes() {
+		
 		for (Station station : data.stations) {
 			
-			Node busNode = graph.addNode(station.busStation);
-			busNode.setAttribute("ui.label", station.busStation);
+		Node busNode = graph.addNode(station.busStation);
+		busNode.setAttribute("ui.label", station.busStation);
 			busNode.setAttribute("ui.class", "bus");
-			busNode.setAttribute("city", station.city);
+		busNode.setAttribute("city", station.city);
 			busNode.setAttribute("stationType", "bus");
 
 			
 			Node trainNode = graph.addNode(station.trainStation);
-			trainNode.setAttribute("ui.label", station.trainStation);
-			trainNode.setAttribute("ui.class", "train");
-			trainNode.setAttribute("city", station.city);
-			trainNode.setAttribute("stationType", "train");
+		trainNode.setAttribute("ui.label", station.trainStation);		trainNode.setAttribute("ui.class", "train");
+		trainNode.setAttribute("city", station.city);
+		trainNode.setAttribute("stationType", "train");
 
+			
 			
 			String transferEdgeId = station.busStation + "-" + station.trainStation;
 			if (graph.getEdge(transferEdgeId) == null) {

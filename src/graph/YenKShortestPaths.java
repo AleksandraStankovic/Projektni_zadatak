@@ -127,20 +127,5 @@ public class YenKShortestPaths {
     
     
     
-    private void debugPrintPaths(List<PathInfo> paths, OptimizationCriteria criteria) {
-        System.out.println("=== Found " + paths.size() + " paths (" + criteria + ") ===");
-        int rank = 1;
-        for (PathInfo p : paths) {
-            System.out.println("Path #" + rank++);
-            System.out.println("   Nodes: " + p.getPath().getNodePath());
-            System.out.println("   Edges: " + p.getPath().getEdgePath());
-            System.out.println("   Time: " + p.getTotalTime());
-            System.out.println("   Cost: " + p.getTotalCost());
-            System.out.println("   Transfers: " + p.getTotalTransfers());
-            System.out.println("   Weight (" + criteria + "): " + getWeight(p, criteria));
-            System.out.println("------------------------------------");
-        }
-    }
-    
 
 }

@@ -6,6 +6,10 @@ import java.nio.file.Path;
 
 public class TransportDataParser {
 
+	/**
+	 * @param filename
+	 * @return
+	 */
 	public static TransportDataGenerator.TransportData parse(String filename) {
 
 		try {
