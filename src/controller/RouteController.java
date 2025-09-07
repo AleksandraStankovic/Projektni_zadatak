@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import model.PathInfo;
 import graph.YenKShortestPaths;
 import org.graphstream.graph.Node;
+import model.RouteSegment;
+
 
 
 public class RouteController {
@@ -44,9 +46,29 @@ public class RouteController {
 		this.routeFinder = new RouteFinder((MultiGraph) transportGraph.buildGraph());
 		this.currentRoutes = new ArrayList<>();
 
-		// printParsedData();
+		
 	}
 
+	
+	
+    public static List<String> extractCityPath(RouteDetails route) {
+        List<String> cityPath = new ArrayList<>();
+        if (route == null || route.getSegments() == null) return cityPath;
+
+        for (RouteSegment seg : route.getSegments()) {
+            String fromCity = seg.getFromCity(); // make sure these getters exist
+            String toCity   = seg.getToCity();
+
+            if (cityPath.isEmpty()) {
+                cityPath.add(fromCity);
+            }
+            if (!cityPath.contains(toCity)) {
+                cityPath.add(toCity);
+            }
+        }
+        return cityPath;
+    }
+	
 	/**
 	 * 
 	 * @return List of all cities

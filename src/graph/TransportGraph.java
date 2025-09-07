@@ -5,10 +5,10 @@ import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import generator.TransportDataGenerator;
 import generator.TransportDataGenerator.Departure;
-import generator.TransportDataGenerator.Station;
-//import model.Station;
-//import model.BusStation;
-//import model.TrainStation;
+import java.util.HashMap;
+import java.util.Map;
+//import generator.TransportDataGenerator.Station;
+import model.Station;
 
 import java.time.LocalTime;
 
@@ -24,31 +24,23 @@ public class TransportGraph {
 		System.setProperty("org.graphstream.ui", "swing");
 	}
 
+	
 	private void addNodes() {
 		
 		for (Station station : data.stations) {
 			
-		Node busNode = graph.addNode(station.busStation);
-		busNode.setAttribute("ui.label", station.busStation);
-			busNode.setAttribute("ui.class", "bus");
-		busNode.setAttribute("city", station.city);
-			busNode.setAttribute("stationType", "bus");
 
-			
-			Node trainNode = graph.addNode(station.trainStation);
-		trainNode.setAttribute("ui.label", station.trainStation);		trainNode.setAttribute("ui.class", "train");
-		trainNode.setAttribute("city", station.city);
-		trainNode.setAttribute("stationType", "train");
+		
+			//sada dodajemo nodes samo jedna vrsta 
+		  Node node = graph.addNode(station.getStationCode());
+		   node.setAttribute("ui.label", station.getStationCode());
+		    node.setAttribute("city", station.getCity());
+//		    node.setAttribute("stationType", station.getType()); 
+		    node.setAttribute("stationType", station.getType()); 
+		    node.setAttribute("ui.class", station.getType()); // <-- this will apply the CSS automatically
 
-			
-			
-			String transferEdgeId = station.busStation + "-" + station.trainStation;
-			if (graph.getEdge(transferEdgeId) == null) {
-				Edge transferEdge = graph.addEdge(transferEdgeId, station.busStation, station.trainStation, true);
-				transferEdge.setAttribute("ui.class", "transfer");
-				transferEdge.setAttribute("type", "transfer");
-				transferEdge.setAttribute("minTransferTime", 5); //ovo je vrijednost za minTransferTime izmedju stanica u istom gradu
-				transferEdge.setAttribute("price", 0);
+		    
+
 				//transferEdge.setAttribute("arrivalTime", 5);//same as min transfer time
 				//arrivalTime bi onda trebao biti jedan min transfer timeu
 				
@@ -56,9 +48,40 @@ public class TransportGraph {
 				//stavicemo da je 0, da ne traje, vec samo da imamo transferTime nista vise 
 			}
 		}
+	
+
+	private void addTransferEdges() {
+	    Map<String, Station> busStations = new HashMap<>();
+	    Map<String, Station> trainStations = new HashMap<>();
+
+	    // Separate them by type
+	    for (Station station : data.stations) {
+	        if (station.getType().equals("autobus")) { // ✔ match what getType() actually returns
+	            busStations.put(station.getCity(), station);
+	        } else if (station.getType().equals("voz")) {
+	            trainStations.put(station.getCity(), station);
+	        }
+	    }
+
+	    // Add transfer edges (bus <-> train in same city)
+	    for (String city : busStations.keySet()) {
+	        Station bus = busStations.get(city);
+	        Station train = trainStations.get(city);
+
+	        if (bus != null && train != null) {
+	            String transferEdgeId = bus.getStationCode() + "-" + train.getStationCode();
+	            if (graph.getEdge(transferEdgeId) == null) {
+	                Edge transfer = graph.addEdge(transferEdgeId, bus.getStationCode(), train.getStationCode(), true);
+	                transfer.setAttribute("type", "transfer");
+	                transfer.setAttribute("ui.class", "transfer");
+	                transfer.setAttribute("minTransferTime", 5);
+	                transfer.setAttribute("price", 0);
+	            }
+	        }
+	    }
 	}
 
-	
+ 
 	
 	private void addEdges() {
 		for (Departure departure : data.departures) {
@@ -70,12 +93,19 @@ public class TransportGraph {
 			
 			
 			String toStation = null;
-			for (Station station : data.stations) {
-				if (station.city.equals(toCity)) {
-					toStation = departure.type.equals("autobus") ? station.busStation : station.trainStation;
-					break;
-				}
-			}
+			
+//			for (Station station : data.stations) {
+//				if (station.city.equals(toCity)) {
+//					toStation = departure.type.equals("autobus") ? station.busStation : station.trainStation;
+//					break;
+//				}
+//			}
+			 for (Station station : data.stations) {
+		            if (station.getCity().equals(toCity) && station.getType().equals(departure.type)) {
+		                toStation = station.getStationCode(); // e.g. "A_0_1" or "Z_0_1"
+		                break;
+		            }
+		        }
 
 			if (toStation != null && !fromStation.equals(toStation)) {
 				String edgeId = fromStation + "-" + toStation + "-" + departure.departureTime;
@@ -109,31 +139,49 @@ public class TransportGraph {
 		}
 	}
 
+
+
+	
+	
 	private void styleGraph() {
-		String css = "graph { padding: 50px; }" + 
-				"node { " + "   size: 20px; " + 
-				"   fill-mode: plain; " + "   text-size: 12; " + 
-				"   text-alignment: at-left; " + "   text-style: bold; " + "} " + "node.bus { "
-				+ "   fill-color: #4CAF50; " + 
-				"   shape: circle; " + "} " + "node.train { " + "   fill-color: #FF9800; " + 
-				"   shape: box; " + "} " + "edge { " + "   text-size: 12; " + "   text-alignment: along; "
-				+ "   text-background-mode: plain; " + "   text-background-color: white; " + "} " + "edge.autobus { "
-				+ "   fill-color: #1976D2; " + "   size: 2px; " + "} " + "edge.voz { " + "   fill-color: #D84315; "
-				+ "   size: 3px; " + "} " + "edge.transfer { " + "   fill-color: black; " + "   size: 3px; "
-				+ "   shape: line; " + "}"
-				+ "node.nonOptimalNode { fill-color: lightgray; stroke-mode: plain; stroke-color: gray; stroke-width: 1px; }"
-				+ "edge.nonOptimal { fill-color: lightgray; size: 2px; }" + "edge.optimal { " + "   fill-color: green; "
-				+ "   size: 4px; " + "} " + "node.optimal { fill-color: purple; " + "   stroke-mode: plain; "
-				+ "   stroke-color: purple; " + "   stroke-width: 3px; " + "} ";
+	    String css = "graph { padding: 50px; }" + 
+	            "node { " + 
+	            "   size: 20px; " + 
+	            "   fill-mode: plain; " + 
+	            "   text-size: 12; " + 
+	            "   text-alignment: at-left; " + 
+	            "   text-style: bold; " + 
+	            "} " + 
+	            "node.autobus { " +      // for bus stations
+	            "   fill-color: #0F4B82; " + // light blue
+	            "   shape: circle; " +        // round
+	            "} " + 
+	            "node.voz { " +          // for train stations
+	            "   fill-color: #FFA500; " + // orange
+	            "   shape: box; " +           // square
+	            "} " +
+	            "edge { " +
+	            "   text-size: 12; " +
+	            "   text-alignment: along; " +
+	            "   text-background-mode: plain; " +
+	            "   text-background-color: white; " +
+	            "} " +
+	            "edge.autobus { fill-color: #1976D2; size: 2px; } " +
+	            "edge.voz { fill-color: #D84315; size: 3px; } " +
+	            "edge.transfer { fill-color: black; size: 3px; shape: line; } " +
+	            "node.nonOptimalNode { fill-color: lightgray; stroke-mode: plain; stroke-color: gray; stroke-width: 1px; } " +
+	            "edge.nonOptimal { fill-color: lightgray; size: 2px; } " +
+	            "edge.optimal { fill-color: green; size: 4px; } " +
+	            "node.optimal { fill-color: purple; stroke-mode: plain; stroke-color: purple; stroke-width: 3px; }";
 
-		;
-
-		graph.setAttribute("ui.stylesheet", css);
+	    graph.setAttribute("ui.stylesheet", css);
 	}
+
 
 	public Graph buildGraph() {
 		graph.clear();
 		addNodes();
+		addTransferEdges();
 		addEdges();
 		styleGraph();
 
@@ -164,6 +212,7 @@ public class TransportGraph {
 	}
 
 	
+	//OVO NE TREBA
 	public void printGraphInfo() {
 		System.out.println("=== GRAPH INFO ===");
 

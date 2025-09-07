@@ -4,9 +4,9 @@ import view.StartupFrame;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-//import model.Station;
-//import model.BusStation;
-//import model.TrainStation;
+import model.Station;
+import model.BusStation;
+import model.TrainStation;
  
 public class TransportDataGenerator {
 	private static int rows;
@@ -53,11 +53,11 @@ public class TransportDataGenerator {
 		public List<Departure> departures;
 	}
 
-	public static class Station {
-		public String city;
-		public String busStation;
-		public String trainStation;
-	}
+//	public static class Station {
+//		public String city;
+//		public String busStation;
+//		public String trainStation;
+//	}
 
 	public static class Departure {
 		public String type; // "autobus" ili "voz"
@@ -94,18 +94,20 @@ public class TransportDataGenerator {
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < cols; y++) {
 				String city = "G_" + x + "_" + y; 
-				Station station = new Station();
-				station.city = "G_" + x + "_" + y;
-				station.busStation = "A_" + x + "_" + y;
-				station.trainStation = "Z_" + x + "_" + y;
+				//Station station = new Station();
+				//station.city = "G_" + x + "_" + y;
+				//String city= "G_" + x + "_" + y;
 				
-//				   BusStation bus = new BusStation(city, "A_" + x + "_" + y);
-//		            TrainStation train = new TrainStation(city, "Z_" + x + "_" + y);
+//				station.busStation = "A_" + x + "_" + y;
+//				station.trainStation = "Z_" + x + "_" + y;
+				
+				   BusStation bus = new BusStation(city, "A_" + x + "_" + y);
+		            TrainStation train = new TrainStation(city, "Z_" + x + "_" + y);
 //
-//		            stations.add(bus);
-//		            stations.add(train);
+		            stations.add(bus);
+		            stations.add(train);
 		            
-				stations.add(station);
+				//stations.add(station);
 			}
 		}
 		return stations;
@@ -115,20 +117,30 @@ public class TransportDataGenerator {
 	private List<Departure> generateDepartures(List<Station> stations) {
 		List<Departure> departures = new ArrayList<>();
 
-		for (Station station : stations) {
-			int x = Integer.parseInt(station.city.split("_")[1]);
-			int y = Integer.parseInt(station.city.split("_")[2]);
+//		for (Station station : stations) {
+//			int x = Integer.parseInt(station.city.split("_")[1]);
+//			int y = Integer.parseInt(station.city.split("_")[2]);
+//
+//			// generisanje polazaka autobusa
+//			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
+//				departures.add(generateDeparture("autobus", station.busStation, x, y));//ovdje treba drugacije i guess...
+//			}
+//
+//			// generisanje polazaka vozova
+//			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
+//				departures.add(generateDeparture("voz", station.trainStation, x, y));
+//			}
+//		}
+		
+		
+		 for (Station station : stations) {
+		        int x = Integer.parseInt(station.getCity().split("_")[1]);
+		        int y = Integer.parseInt(station.getCity().split("_")[2]);
 
-			// generisanje polazaka autobusa
-			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
-				departures.add(generateDeparture("autobus", station.busStation, x, y));
-			}
-
-			// generisanje polazaka vozova
-			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
-				departures.add(generateDeparture("voz", station.trainStation, x, y));
-			}
-		}
+		        for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
+		            departures.add(generateDeparture(station.getType(), station.getStationCode(), x, y));
+		        }
+		    }
 		return departures;
 	}
 
@@ -193,19 +205,33 @@ public class TransportDataGenerator {
 			}
 			json.append("  ],\n");
 
-			// stanice
+//			// stanice
+//			json.append("  \"stations\": [\n");
+//			for (int i = 0; i < data.stations.size(); i++) {
+//				Station s = data.stations.get(i);
+//				json.append("    {\"city\": \"").append(s.city).append("\", \"busStation\": \"").append(s.busStation)
+//						.append("\", \"trainStation\": \"").append(s.trainStation).append("\"}");
+//				if (i < data.stations.size() - 1)
+//					json.append(",");
+//				json.append("\n");
+//			}
+//			json.append("  ],\n");
+			
+			
+			// stations
 			json.append("  \"stations\": [\n");
 			for (int i = 0; i < data.stations.size(); i++) {
-				Station s = data.stations.get(i);
-				json.append("    {\"city\": \"").append(s.city).append("\", \"busStation\": \"").append(s.busStation)
-						.append("\", \"trainStation\": \"").append(s.trainStation).append("\"}");
-				if (i < data.stations.size() - 1)
-					json.append(",");
-				json.append("\n");
+			    model.Station s = data.stations.get(i);
+			    json.append("    {\"city\": \"").append(s.getCity())
+			        .append("\", \"stationCode\": \"").append(s.getStationCode())
+			        .append("\", \"type\": \"").append(s.getType()).append("\"}");
+			    if (i < data.stations.size() - 1)
+			        json.append(",");
+			    json.append("\n");
 			}
 			json.append("  ],\n");
 
-			// vremena polazaka
+			
 			json.append("  \"departures\": [\n");
 			for (int i = 0; i < data.departures.size(); i++) {
 				Departure d = data.departures.get(i);

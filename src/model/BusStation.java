@@ -1,17 +1,14 @@
 package model;
 
-/**
- * Represents a bus station within a city.
- */
 public class BusStation extends Station {
-    private String stationCode;
+    public BusStation() {}  // default constructor for Jackson
 
-    public BusStation(String city, String busStation) {
-        super(city, busStation, null); // no train station here
-        this.stationCode = busStation;
+    public BusStation(String city, String stationCode) {
+        super(city, stationCode);
     }
 
-    public String getStationCode() {
-        return stationCode;
+    @Override
+    public String getType() {
+        return "autobus";
     }
 }

@@ -315,5 +315,28 @@ public class RouteFinder {
 
 		return details;
 	}
+	
+	
+	public List<String> getCityPath(PathInfo pathInfo) {
+	    List<String> cityPath = new ArrayList<>();
+	    if (pathInfo == null || pathInfo.getPath() == null) return cityPath;
+
+	    for (Edge edge : pathInfo.getPath().getEdgePath()) {
+	        Node from = edge.getSourceNode();
+	        Node to = edge.getTargetNode();
+	        String fromCity = (String) from.getAttribute("city");
+	        String toCity = (String) to.getAttribute("city");
+
+	        if (!cityPath.contains(fromCity)) cityPath.add(fromCity);
+	        if (!cityPath.contains(toCity)) cityPath.add(toCity);
+	    }
+	    return cityPath;
+	}
+
+
+	
+	
+	
+	
 
 }

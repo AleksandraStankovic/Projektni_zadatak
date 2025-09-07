@@ -24,6 +24,7 @@ import graph.TransportGraph;
 import model.OptimizationCriteria;
 import model.RouteDetails;
 import model.RouteSegment;
+import graph.CityGraph;
 
 import model.PathInfo;
 
@@ -185,14 +186,22 @@ public class MainFrame extends JFrame {
 				GraphFrame graphFrame = new GraphFrame(transportGraph);
 				graphFrame.getGraphPanel().highlightPath(new PathInfo(bestRoute.getPath()));
 				graphFrame.setVisible(true);
+				
+				  CityGraph cityGraph = new CityGraph(data);
+			        CityGraphFrame cityFrame = new CityGraphFrame(cityGraph);
+			        List<String> cityPath = controller.extractCityPath(bestRoute);
+
+			        cityFrame.getGraphPanel().highlightCityPath(cityPath);
+			        cityFrame.setVisible(true);
 			}
 		});
 
 		JButton btnPrikaziGraf = new JButton("Prikaži graf");
 
 		btnPrikaziGraf.addActionListener(e -> {
-			GraphFrame graphFrame = new GraphFrame(transportGraph);// prosledjujemo graf
+			GraphFrame graphFrame = new GraphFrame(transportGraph);
 			graphFrame.setVisible(true);
+			
 		});
 
 		btnKupi.addActionListener(e -> {
@@ -256,6 +265,29 @@ public class MainFrame extends JFrame {
 		graphButtonsPanel.setOpaque(false);
 
 		graphButtonsPanel.setBackground(new Color(220, 220, 220));
+		
+		JButton btnCityGraph = new JButton("Prikaži graf gradova");
+		//btnCityGraph.setPreferredSize(buttonSize);
+	//	btnCityGraph.setFont(buttonFont);
+		btnCityGraph.setBackground(new Color(255, 140, 0)); // orange
+		btnCityGraph.setForeground(Color.WHITE);
+		btnCityGraph.setFocusPainted(false);
+
+		btnCityGraph.addActionListener(e -> {
+		    CityGraph cityGraph = new CityGraph(data);
+		    CityGraphFrame frame = new CityGraphFrame(cityGraph);
+		    frame.setVisible(true);
+		});
+
+ 
+		// Add button to your graphButtonsPaneld
+		GridBagConstraints gbc2 = new GridBagConstraints();
+		gbc2.gridx = 0;
+		gbc2.gridy = 1;
+		gbc2.insets = new Insets(10, 10, 10, 10);
+
+		graphButtonsPanel.add(btnCityGraph, gbc2);
+
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;

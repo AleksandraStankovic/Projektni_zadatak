@@ -8,6 +8,9 @@ public class RouteSegment {
 	private String arrivalTime;
 	private int duration;
 	private int price;
+	
+	private String fromCity;
+	private String toCity;
 
 	public RouteSegment() {
 
@@ -83,5 +86,21 @@ public class RouteSegment {
 
 	public String getFormattedPrice() {
 		return price + " n.j.";
+	}
+	
+	public String getFromCity() {
+	    return fromCity;
+	}
+
+	public void setFromCity(String fromCity) {
+	    this.fromCity = fromCity;
+	}
+
+	public String getToCity() {
+	    return toCity;
+	}
+
+	public void setToCity(String toCity) {
+	    this.toCity = toCity;
 	}
 }
