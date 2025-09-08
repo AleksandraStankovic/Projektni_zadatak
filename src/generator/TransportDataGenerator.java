@@ -205,20 +205,10 @@ public class TransportDataGenerator {
 			}
 			json.append("  ],\n");
 
-//			// stanice
-//			json.append("  \"stations\": [\n");
-//			for (int i = 0; i < data.stations.size(); i++) {
-//				Station s = data.stations.get(i);
-//				json.append("    {\"city\": \"").append(s.city).append("\", \"busStation\": \"").append(s.busStation)
-//						.append("\", \"trainStation\": \"").append(s.trainStation).append("\"}");
-//				if (i < data.stations.size() - 1)
-//					json.append(",");
-//				json.append("\n");
-//			}
-//			json.append("  ],\n");
+
 			
 			
-			// stations
+			
 			json.append("  \"stations\": [\n");
 			for (int i = 0; i < data.stations.size(); i++) {
 			    model.Station s = data.stations.get(i);

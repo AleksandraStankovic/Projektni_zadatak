@@ -217,6 +217,7 @@ setContentPane(mainPanel);
 
 		
 		@Override
+	
 		public Object getCellEditorValue() {
 		    if (clicked) {
 		        int row = table.getEditingRow();
@@ -225,17 +226,18 @@ setContentPane(mainPanel);
 		            Racun racun = new Racun(route);
 		            try {
 		                RacunUtil.sacuvajRacun(racun); 
-		                JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
-		                        racun.generisiRacun(), "Karta kupljena", JOptionPane.INFORMATION_MESSAGE);
+		               
+		            
 		            } catch (IOException e) {
-		                JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
-		                        "Greška pri čuvanju računa: " + e.getMessage(), "Greška", JOptionPane.ERROR_MESSAGE);
+		                // Handle the error silently or log it
+		                System.err.println("Greška pri čuvanju računa: " + e.getMessage());
 		            }
 		        }
 		    }
 		    clicked = false;
 		    return label;
 		}
+
 
 
 }

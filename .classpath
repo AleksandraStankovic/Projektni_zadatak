@@ -6,10 +6,10 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/gs-core-2.0.jar"/>
-	<classpathentry kind="lib" path="lib/gs-ui-swing-2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/aleks/Downloads/jackson-annotations-2.15.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/aleks/Downloads/jackson-core-2.15.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/aleks/Downloads/jackson-databind-2.15.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/aleks/Downloads/gs-ui-swing-2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/aleks/Downloads/gs-core-2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

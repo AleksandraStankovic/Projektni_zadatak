@@ -56,7 +56,7 @@ public class RouteController {
         if (route == null || route.getSegments() == null) return cityPath;
 
         for (RouteSegment seg : route.getSegments()) {
-            String fromCity = seg.getFromCity(); // make sure these getters exist
+            String fromCity = seg.getFromCity(); 
             String toCity   = seg.getToCity();
 
             if (cityPath.isEmpty()) {

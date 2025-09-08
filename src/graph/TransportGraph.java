@@ -220,28 +220,31 @@ public class TransportGraph {
 
 		graph.setAttribute("ui.stylesheet", css);
 	}
-    /**
-     * Constructs and returns a complete graph representing stations and connections.
-     *
-     * <p>
-     * The method performs the following steps:
-     * </p>
-     * <ol>
-     *   <li>Clears any existing nodes and edges from the graph.</li>
-     *   <li>Adds nodes for each station in the data set.</li>
-     *   <li>Adds transfer edges connecting bus and train stations within the same city.</li>
-     *   <li>Adds edges representing scheduled departures between stations.</li>
-     *   <li>Applies visual styling to nodes and edges.</li>
-     * </ol>
-     *
-     * <p>
-     * After construction, the method counts the number of transfer edges
-     * and transport edges (bus or train) in the graph.
-     * </p>
-     *
-     * @return the fully constructed and styled graph representing all
-     *         stations, transfers, and transport connections
-     */
+
+	/**
+	 * Constructs and returns a complete graph representing stations and
+	 * connections.
+	 *
+	 * <p>
+	 * The method performs the following steps:
+	 * </p>
+	 * <ol>
+	 * <li>Clears any existing nodes and edges from the graph.</li>
+	 * <li>Adds nodes for each station in the data set.</li>
+	 * <li>Adds transfer edges connecting bus and train stations within the same
+	 * city.</li>
+	 * <li>Adds edges representing scheduled departures between stations.</li>
+	 * <li>Applies visual styling to nodes and edges.</li>
+	 * </ol>
+	 *
+	 * <p>
+	 * After construction, the method counts the number of transfer edges and
+	 * transport edges (bus or train) in the graph.
+	 * </p>
+	 *
+	 * @return the fully constructed and styled graph representing all stations,
+	 *         transfers, and transport connections
+	 */
 
 	public Graph buildGraph() {
 		graph.clear();
@@ -249,7 +252,6 @@ public class TransportGraph {
 		addTransferEdges();
 		addEdges();
 		styleGraph();
-
 
 		int transferEdges = 0;
 		int transportEdges = 0;
@@ -264,10 +266,7 @@ public class TransportGraph {
 			}
 		}
 
-
-
 		return graph;
 	}
-
 
 }
