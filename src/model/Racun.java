@@ -4,13 +4,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.graphstream.graph.Node;
 import java.util.List;
+
 /**
  * Represents a receipt for a purchased route.
  *
  * <p>
  * The class stores information about the departure city, destination city,
- * total price, travel time, and purchase date. It provides methods to
- * generate a formatted receipt string.
+ * total price, travel time, and purchase date. It provides methods to generate
+ * a formatted receipt string.
  * </p>
  *
  * <p>
@@ -24,7 +25,6 @@ import java.util.List;
  * from the route path.
  * </p>
  */
-
 
 public class Racun {
 

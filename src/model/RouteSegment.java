@@ -1,17 +1,19 @@
 package model;
+
 /**
  * Represents a segment of a route between two stations.
  *
  * <p>
  * Each segment contains information about the departure and arrival stations,
  * the type of transport (bus or train), departure and arrival times, duration,
- * and price. Optional fields store the cities of the departure and arrival stations.
+ * and price. Optional fields store the cities of the departure and arrival
+ * stations.
  * </p>
  *
  * <p>
- * The class provides constructors for creating a segment with or without initial values,
- * as well as getters and setters for all fields. Utility methods are available to
- * get formatted duration and price.
+ * The class provides constructors for creating a segment with or without
+ * initial values, as well as getters and setters for all fields. Utility
+ * methods are available to get formatted duration and price.
  * </p>
  */
 
@@ -23,7 +25,7 @@ public class RouteSegment {
 	private String arrivalTime;
 	private int duration;
 	private int price;
-	
+
 	private String fromCity;
 	private String toCity;
 
@@ -102,20 +104,20 @@ public class RouteSegment {
 	public String getFormattedPrice() {
 		return price + " n.j.";
 	}
-	
+
 	public String getFromCity() {
-	    return fromCity;
+		return fromCity;
 	}
 
 	public void setFromCity(String fromCity) {
-	    this.fromCity = fromCity;
+		this.fromCity = fromCity;
 	}
 
 	public String getToCity() {
-	    return toCity;
+		return toCity;
 	}
 
 	public void setToCity(String toCity) {
-	    this.toCity = toCity;
+		this.toCity = toCity;
 	}
 }

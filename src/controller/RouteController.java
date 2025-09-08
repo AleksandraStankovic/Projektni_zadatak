@@ -16,62 +16,82 @@ import graph.YenKShortestPaths;
 import org.graphstream.graph.Node;
 import model.RouteSegment;
 
-
-
 public class RouteController {
 
 	private TransportDataGenerator.TransportData transportData;
 	private TransportGraph transportGraph;
 	private RouteFinder routeFinder;
-	private List<RouteDetails> currentRoutes; 
-	
-	
+	private List<RouteDetails> currentRoutes;
+
 	public List<RouteDetails> findTopKRoutes(String fromCity, String toCity, OptimizationCriteria criteria, int k) {
-	    MultiGraph graph = (MultiGraph) transportGraph.buildGraph();
-	    YenKShortestPaths yen = new YenKShortestPaths(graph);
+		MultiGraph graph = (MultiGraph) transportGraph.buildGraph();
+		YenKShortestPaths yen = new YenKShortestPaths(graph);
 
-	    List<PathInfo> pathInfos = yen.findTopKPaths(fromCity, toCity, criteria, k);
+		List<PathInfo> pathInfos = yen.findTopKPaths(fromCity, toCity, criteria, k);
 
-	    return convertPathInfosToRouteDetails(pathInfos);
+		return convertPathInfosToRouteDetails(pathInfos);
 	}
-
-
 
 	public RouteController(TransportDataGenerator.TransportData transportData)
 
 	{
 		this.transportData = transportData;
 		this.transportGraph = new TransportGraph(transportData);
-		
+
 		this.routeFinder = new RouteFinder((MultiGraph) transportGraph.buildGraph());
 		this.currentRoutes = new ArrayList<>();
 
-		
 	}
 
-	
-	
-    public static List<String> extractCityPath(RouteDetails route) {
-        List<String> cityPath = new ArrayList<>();
-        if (route == null || route.getSegments() == null) return cityPath;
-
-        for (RouteSegment seg : route.getSegments()) {
-            String fromCity = seg.getFromCity(); 
-            String toCity   = seg.getToCity();
-
-            if (cityPath.isEmpty()) {
-                cityPath.add(fromCity);
-            }
-            if (!cityPath.contains(toCity)) {
-                cityPath.add(toCity);
-            }
-        }
-        return cityPath;
-    }
-	
 	/**
-	 * 
-	 * @return List of all cities
+	 * Extracts the sequence of cities from a given route.
+	 *
+	 * <p>
+	 * The method builds a list of city names by iterating through all route
+	 * segments. It ensures that:
+	 * <ul>
+	 * <li>The starting city of the first segment is included.</li>
+	 * <li>Each destination city is added only once, in the order of travel.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * <p>
+	 * If the route is null or contains no segments, an empty list is returned.
+	 * </p>
+	 *
+	 * @param route the route from which to extract the ordered list of cities
+	 * @return a list of city names representing the travel path
+	 */
+	public static List<String> extractCityPath(RouteDetails route) {
+		List<String> cityPath = new ArrayList<>();
+		if (route == null || route.getSegments() == null)
+			return cityPath;
+
+		for (RouteSegment seg : route.getSegments()) {
+			String fromCity = seg.getFromCity();
+			String toCity = seg.getToCity();
+
+			if (cityPath.isEmpty()) {
+				cityPath.add(fromCity);
+			}
+			if (!cityPath.contains(toCity)) {
+				cityPath.add(toCity);
+			}
+		}
+		return cityPath;
+	}
+
+	/**
+	 * Retrieves all cities from the transport data's country map.
+	 *
+	 * <p>
+	 * The method flattens the 2D array `countryMap` into a 1D array of city names.
+	 * If the transport data or the country map is not initialized, an empty array
+	 * is returned.
+	 * </p>
+	 *
+	 * @return an array of all city names present in the country map, or an empty
+	 *         array if no data is available
 	 */
 	public String[] getAllCities() {
 		if (transportData == null || transportData.countryMap == null)
@@ -100,8 +120,6 @@ public class RouteController {
 		cbPolaziste.setModel(new DefaultComboBoxModel<>(cities));
 		cbOdrediste.setModel(new DefaultComboBoxModel<>(cities));
 	}
-
-	
 
 	/**
 	 * Removes city selected in Polaziste Combo box from Odrediste Combo Box
@@ -135,117 +153,147 @@ public class RouteController {
 		}
 		return routeDetailsList;
 	}
-	
-	
-	
-	
 
 	public List<RouteDetails> getCurrentRoutes() {
 		return currentRoutes;
 	}
 
+	/**
+	 * Finds the best route between two cities according to the specified
+	 * optimization criteria.
+	 *
+	 * <p>
+	 * The method considers all stations in the origin city and all stations in the
+	 * destination city. For each possible pair of start and end stations, it
+	 * computes the shortest path using Dijkstra's algorithm via the RouteFinder.
+	 * The path with the best value according to the provided
+	 * {@link OptimizationCriteria} is selected.
+	 * </p>
+	 *
+	 * <p>
+	 * The optimization criteria can be:
+	 * <ul>
+	 * <li>SHORTEST_TIME – chooses the path with the minimum total travel time</li>
+	 * <li>code LOWEST_COST – chooses the path with the minimum total cost</li>
+	 * <li>code FEWEST_TRANSFERS – chooses the path with the least number of
+	 * transfers</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * <p>
+	 * The resulting best route is stored in currentRoutes as the first element. If
+	 * no valid path exists between the cities, the method returns {@code null}.
+	 * </p>
+	 *
+	 * @param fromCity the name of the origin city
+	 * @param toCity   the name of the destination city
+	 * @param criteria the optimization criteria to determine the best route
+	 * @return a RouteDetails object representing the best route, or null if no
+	 *         route exists
+	 */
 	public RouteDetails findBestRoute(String fromCity, String toCity, OptimizationCriteria criteria) {
-	    List<Node> startNodes = routeFinder.getStationsForCity(fromCity);
-	    List<Node> endNodes = routeFinder.getStationsForCity(toCity);
+		List<Node> startNodes = routeFinder.getStationsForCity(fromCity);
+		List<Node> endNodes = routeFinder.getStationsForCity(toCity);
 
-	    PathInfo bestPathInfo = null;
+		PathInfo bestPathInfo = null;
 
-	    for (Node start : startNodes) {
-	        for (Node end : endNodes) {
-	            if (!start.equals(end)) {
-	                PathInfo path = routeFinder.dijkstraShortestPath(start, end, criteria);
-	                if (path != null) {
-	                    
-	                    if (bestPathInfo == null) {
-	                        bestPathInfo = path;
-	                    } else {
-	                        switch (criteria) {
-	                            case SHORTEST_TIME:
-	                                if (path.getTotalTime() < bestPathInfo.getTotalTime()) bestPathInfo = path;
-	                                break;
-	                            case LOWEST_COST:
-	                                if (path.getTotalCost() < bestPathInfo.getTotalCost()) bestPathInfo = path;
-	                                break;
-	                            case FEWEST_TRANSFERS:
-	                                if (path.getTotalTransfers() < bestPathInfo.getTotalTransfers()) bestPathInfo = path;
-	                                break;
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	    }
+		for (Node start : startNodes) {
+			for (Node end : endNodes) {
+				if (!start.equals(end)) {
+					PathInfo path = routeFinder.dijkstraShortestPath(start, end, criteria);
+					if (path != null) {
 
-	    if (bestPathInfo == null) return null;
+						if (bestPathInfo == null) {
+							bestPathInfo = path;
+						} else {
+							switch (criteria) {
+							case SHORTEST_TIME:
+								if (path.getTotalTime() < bestPathInfo.getTotalTime())
+									bestPathInfo = path;
+								break;
+							case LOWEST_COST:
+								if (path.getTotalCost() < bestPathInfo.getTotalCost())
+									bestPathInfo = path;
+								break;
+							case FEWEST_TRANSFERS:
+								if (path.getTotalTransfers() < bestPathInfo.getTotalTransfers())
+									bestPathInfo = path;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 
-	 
-	    RouteDetails bestRoute = new RouteDetails(bestPathInfo);
-	    currentRoutes = new ArrayList<>();
-	    currentRoutes.add(bestRoute); 
-	    return bestRoute;
+		if (bestPathInfo == null)
+			return null;
+
+		RouteDetails bestRoute = new RouteDetails(bestPathInfo);
+		currentRoutes = new ArrayList<>();
+		currentRoutes.add(bestRoute);
+		return bestRoute;
 	}
 
-
-
-
-	
-	/**
-	 * Gets the transport graph for visualization
-	 */
 	public TransportGraph getTransportGraph() {
 		return transportGraph;
 	}
 
-	/**
-	 * Gets the route finder instance
-	 */
 	public RouteFinder getRouteFinder() {
 		return routeFinder;
 	}
 
-	
-
-//	}
-	/**
-	 * Helper method to convert display text to OptimizationCriteria
-	 */
 	public OptimizationCriteria getCriteriaFromDisplayText(String displayText) {
-	    if (displayText == null) return OptimizationCriteria.SHORTEST_TIME;
-	    
-	    switch (displayText) {
-	        case "Najkraće vrijeme":
-	            return OptimizationCriteria.SHORTEST_TIME;
-	        case "Najniža cijena":
-	            return OptimizationCriteria.LOWEST_COST;
-	        case "Najmanje presjedanja":
-	            return OptimizationCriteria.FEWEST_TRANSFERS;
-	        default:
-	            return OptimizationCriteria.SHORTEST_TIME; // default
-	    }
-	}
-	
+		if (displayText == null)
+			return OptimizationCriteria.SHORTEST_TIME;
 
-	/**
-	 * Validates if two cities are different
-	 */
+		switch (displayText) {
+		case "Najkraće vrijeme":
+			return OptimizationCriteria.SHORTEST_TIME;
+		case "Najniža cijena":
+			return OptimizationCriteria.LOWEST_COST;
+		case "Najmanje presjedanja":
+			return OptimizationCriteria.FEWEST_TRANSFERS;
+		default:
+			return OptimizationCriteria.SHORTEST_TIME;
+		}
+	}
+
 	public boolean validateCities(String fromCity, String toCity) {
 		return fromCity != null && toCity != null && !fromCity.equals(toCity);
 	}
 
 	/**
-	 * Gets statistics about the transport network
+	 * Returns a summary of statistics about the transport network.
+	 *
+	 * <p>
+	 * The method calculates and reports:
+	 * <ul>
+	 * <li>The total number of cities based on the {@code countryMap} array.</li>
+	 * <li>The total number of stations, assuming each city has a bus and a train
+	 * station.</li>
+	 * <li>The total number of departures available in the transport data.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * <p>
+	 * If the transport data is not loaded the method returns a message indicating
+	 * that no data is available.
+	 * </p>
+	 *
+	 * @return a formatted {@code String} summarizing the total number of cities,
+	 *         stations, and departures, or "No data loaded" if transport data is
+	 *         unavailable
 	 */
 	public String getNetworkStatistics() {
 		if (transportData == null)
 			return "No data loaded";
 
 		int totalCities = transportData.countryMap.length * transportData.countryMap[0].length;
-		int totalStations = transportData.stations.size() * 2; // Bus + train per city
+		int totalStations = transportData.stations.size() * 2;
 		int totalDepartures = transportData.departures.size();
 
 		return String.format("Cities: %d | Stations: %d | Departures: %d", totalCities, totalStations, totalDepartures);
 	}
 
 }
-
-

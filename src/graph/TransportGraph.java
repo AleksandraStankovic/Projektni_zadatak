@@ -87,7 +87,7 @@ public class TransportGraph {
 		Map<String, Station> trainStations = new HashMap<>();
 
 		for (Station station : data.stations) {
-			if (station.getType().equals("autobus")) { // ✔ match what getType() actually returns
+			if (station.getType().equals("autobus")) {
 				busStations.put(station.getCity(), station);
 			} else if (station.getType().equals("voz")) {
 				trainStations.put(station.getCity(), station);
@@ -173,10 +173,7 @@ public class TransportGraph {
 
 						edge.setAttribute("duration", departure.duration);
 						edge.setAttribute("price", departure.price);
-						edge.setAttribute("minTransferTime", departure.minTransferTime);// minTransferTime u edgu koji
-																						// povezuje stanice u različitin
-																						// gradovima
-
+						edge.setAttribute("minTransferTime", departure.minTransferTime);
 						String uiClass = departure.type.equals("autobus") ? "autobus" : "voz";
 						edge.setAttribute("ui.class", uiClass);
 
@@ -252,19 +249,6 @@ public class TransportGraph {
 		addTransferEdges();
 		addEdges();
 		styleGraph();
-
-		int transferEdges = 0;
-		int transportEdges = 0;
-
-		for (int i = 0; i < graph.getEdgeCount(); i++) {
-			Edge edge = graph.getEdge(i);
-			String type = (String) edge.getAttribute("type");
-			if ("transfer".equals(type)) {
-				transferEdges++;
-			} else if (type != null) {
-				transportEdges++;
-			}
-		}
 
 		return graph;
 	}

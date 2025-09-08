@@ -7,14 +7,17 @@ import java.util.*;
 import model.Station;
 import model.BusStation;
 import model.TrainStation;
- 
+
+/**
+ * Generates transport network data including cities, stations, and departures.
+ * Provides methods to generate, save, and manipulate transport data.
+ */
 public class TransportDataGenerator {
 	private static int rows;
 	private static int cols;
 	private static final int DEPARTURES_PER_STATION = 10;
 	private static final Random random = new Random();
 
-	
 	public static void setDimensions(int rows, int cols) {
 		if (rows <= 0 || cols <= 0) {
 			throw new IllegalArgumentException("Dimenzije moraju biti pozitivni cijeli brojevi. ");
@@ -27,7 +30,7 @@ public class TransportDataGenerator {
 		TransportDataGenerator generator = new TransportDataGenerator();
 		TransportData data = generator.generateData();
 		generator.saveToJson(data, "transport_data.json");
-		System.out.println("Data generated successfully for " + rows + "×" + cols + " matrix");
+
 	}
 
 	private TransportDataGenerator() {
@@ -36,28 +39,19 @@ public class TransportDataGenerator {
 		}
 	}
 
-
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(() -> {
 			StartupFrame sFrame = new StartupFrame();
 			sFrame.setVisible(true);
 		});
 
-
 	}
-
 
 	public static class TransportData {
 		public String[][] countryMap;
 		public List<Station> stations;
 		public List<Departure> departures;
 	}
-
-//	public static class Station {
-//		public String city;
-//		public String busStation;
-//		public String trainStation;
-//	}
 
 	public static class Departure {
 		public String type; // "autobus" ili "voz"
@@ -88,62 +82,67 @@ public class TransportDataGenerator {
 		return countryMap;
 	}
 
-	// generisanje autobuskih i zeljeznickih stanica
+	/**
+	 * Generates stations for all cities in the country map. For each city, both a
+	 * bus station and a train station are created. The station codes are generated
+	 * using a consistent naming scheme: - Bus stations: "A_X_Y" - Train stations:
+	 * "Z_X_Y"
+	 *
+	 * @return a list containing all generated bus and train stations
+	 */
 	private List<Station> generateStations() {
 		List<Station> stations = new ArrayList<>();
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < cols; y++) {
-				String city = "G_" + x + "_" + y; 
-				//Station station = new Station();
-				//station.city = "G_" + x + "_" + y;
-				//String city= "G_" + x + "_" + y;
-				
-//				station.busStation = "A_" + x + "_" + y;
-//				station.trainStation = "Z_" + x + "_" + y;
-				
-				   BusStation bus = new BusStation(city, "A_" + x + "_" + y);
-		            TrainStation train = new TrainStation(city, "Z_" + x + "_" + y);
-//
-		            stations.add(bus);
-		            stations.add(train);
-		            
-				//stations.add(station);
+				String city = "G_" + x + "_" + y;
+
+				BusStation bus = new BusStation(city, "A_" + x + "_" + y);
+				TrainStation train = new TrainStation(city, "Z_" + x + "_" + y);
+
+				stations.add(bus);
+				stations.add(train);
+
 			}
 		}
 		return stations;
 	}
 
-	// generisanje vremena polazaka
+	/**
+	 * Generates departures for each station provided in the list. Each station will
+	 * have a fixed number of departures defined by DEPARTURES_PER_STATION. The
+	 * departure details (destination, time, duration, price, and minimum transfer
+	 * time) are randomly generated.
+	 *
+	 * @param stations the list of stations for which departures will be generated
+	 * @return a list containing all generated departures
+	 */
+
 	private List<Departure> generateDepartures(List<Station> stations) {
 		List<Departure> departures = new ArrayList<>();
 
-//		for (Station station : stations) {
-//			int x = Integer.parseInt(station.city.split("_")[1]);
-//			int y = Integer.parseInt(station.city.split("_")[2]);
-//
-//			// generisanje polazaka autobusa
-//			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
-//				departures.add(generateDeparture("autobus", station.busStation, x, y));//ovdje treba drugacije i guess...
-//			}
-//
-//			// generisanje polazaka vozova
-//			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
-//				departures.add(generateDeparture("voz", station.trainStation, x, y));
-//			}
-//		}
-		
-		
-		 for (Station station : stations) {
-		        int x = Integer.parseInt(station.getCity().split("_")[1]);
-		        int y = Integer.parseInt(station.getCity().split("_")[2]);
+		for (Station station : stations) {
+			int x = Integer.parseInt(station.getCity().split("_")[1]);
+			int y = Integer.parseInt(station.getCity().split("_")[2]);
 
-		        for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
-		            departures.add(generateDeparture(station.getType(), station.getStationCode(), x, y));
-		        }
-		    }
+			for (int i = 0; i < DEPARTURES_PER_STATION; i++) {
+				departures.add(generateDeparture(station.getType(), station.getStationCode(), x, y));
+			}
+		}
 		return departures;
 	}
 
+	/**
+	 * Generates a single departure from a given station. The departure's
+	 * destination, departure time, duration, price, and minimum transfer time are
+	 * generated randomly. The destination is chosen from neighboring cities, if
+	 * available.
+	 *
+	 * @param type the type of transport ("autobus" or "voz")
+	 * @param from the station code from which the departure originates
+	 * @param x    the row index of the city in the country map
+	 * @param y    the column index of the city in the country map
+	 * @return a Departure object with randomly generated details
+	 */
 	private Departure generateDeparture(String type, String from, int x, int y) {
 		Departure departure = new Departure();
 		departure.type = type;
@@ -205,23 +204,17 @@ public class TransportDataGenerator {
 			}
 			json.append("  ],\n");
 
-
-			
-			
-			
 			json.append("  \"stations\": [\n");
 			for (int i = 0; i < data.stations.size(); i++) {
-			    model.Station s = data.stations.get(i);
-			    json.append("    {\"city\": \"").append(s.getCity())
-			        .append("\", \"stationCode\": \"").append(s.getStationCode())
-			        .append("\", \"type\": \"").append(s.getType()).append("\"}");
-			    if (i < data.stations.size() - 1)
-			        json.append(",");
-			    json.append("\n");
+				model.Station s = data.stations.get(i);
+				json.append("    {\"city\": \"").append(s.getCity()).append("\", \"stationCode\": \"")
+						.append(s.getStationCode()).append("\", \"type\": \"").append(s.getType()).append("\"}");
+				if (i < data.stations.size() - 1)
+					json.append(",");
+				json.append("\n");
 			}
 			json.append("  ],\n");
 
-			
 			json.append("  \"departures\": [\n");
 			for (int i = 0; i < data.departures.size(); i++) {
 				Departure d = data.departures.get(i);

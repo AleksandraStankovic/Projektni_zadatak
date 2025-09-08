@@ -139,7 +139,7 @@ public class RouteFinder {
 		int minTransferTime;
 
 		LocalTime prevEarliest;
-		LocalTime startDepartureTime = LocalTime.of(8, 0); // 8:00 AM
+		LocalTime startDepartureTime = LocalTime.of(8, 0);
 
 		LocalTime earliestDepartureTime = startDepartureTime;
 
@@ -150,7 +150,7 @@ public class RouteFinder {
 			NodeDistance current = queue.poll();
 			Node currentNode = current.node;
 
-			Edge edgeIntoCurrent = previousEdges.get(currentNode);// ivica koja je dovela u trenutni najbolji I guess
+			Edge edgeIntoCurrent = previousEdges.get(currentNode);
 
 			if (currentNode.equals(end))
 				break;
@@ -193,8 +193,7 @@ public class RouteFinder {
 				}
 
 				if (deptTime != null && deptTime.isBefore(earliestForThisEdge)) {
-					System.out.println("Skipping edge " + edge.getId() + " (dep " + deptTime + " < earliest "
-							+ earliestForThisEdge + ")");
+
 					continue;
 				}
 

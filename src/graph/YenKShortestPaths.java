@@ -11,145 +11,141 @@ import java.util.*;
 
 public class YenKShortestPaths {
 
-    
-    private final RouteFinder routeFinder;
+	private final RouteFinder routeFinder;
 
-    public YenKShortestPaths(MultiGraph graph) {
-        
-        this.routeFinder = new RouteFinder(graph);
-    }
+	public YenKShortestPaths(MultiGraph graph) {
 
-    /**
-     * Finds the top K paths between two cities according to the specified optimization criteria.
-     *
-     * <p>
-     * The method first retrieves all station nodes in the origin and destination cities.
-     * It then computes shortest paths between each pair of start and end nodes using Dijkstra's algorithm.
-     * </p>
-     *
-     * <p>
-     * After finding the initial shortest paths, the method uses a variation of Yen's algorithm
-     * to generate alternative paths by temporarily disabling edges in the previously found paths,
-     * and recomputing spur paths from intermediate nodes.
-     * </p>
-     *
-     * <p>
-     * For each candidate path, the total travel time, cost, and number of transfers are calculated
-     * based on edge weights. The top K paths are returned in order of increasing weight according
-     * to the given optimization criteria.
-     * </p>
-     *
-     * @param fromCity the starting city
-     * @param toCity the destination city
-     * @param criteria the optimization criteria (shortest time, lowest cost, fewest transfers)
-     * @param K the maximum number of top paths to return
-     * @return a list of up to K {@link PathInfo} objects representing the best paths between the cities
-     */
+		this.routeFinder = new RouteFinder(graph);
+	}
 
-    public List<PathInfo> findTopKPaths(String fromCity, String toCity, OptimizationCriteria criteria, int K) {
-        List<Node> startNodes = routeFinder.getStationsForCity(fromCity);
-        List<Node> endNodes = routeFinder.getStationsForCity(toCity);
+	/**
+	 * Finds the top K paths between two cities according to the specified
+	 * optimization criteria.
+	 *
+	 * <p>
+	 * The method first retrieves all station nodes in the origin and destination
+	 * cities. It then computes shortest paths between each pair of start and end
+	 * nodes using Dijkstra's algorithm.
+	 * </p>
+	 *
+	 * <p>
+	 * After finding the initial shortest paths, the method uses a variation of
+	 * Yen's algorithm to generate alternative paths by temporarily disabling edges
+	 * in the previously found paths, and recomputing spur paths from intermediate
+	 * nodes.
+	 * </p>
+	 *
+	 * <p>
+	 * For each candidate path, the total travel time, cost, and number of transfers
+	 * are calculated based on edge weights. The top K paths are returned in order
+	 * of increasing weight according to the given optimization criteria.
+	 * </p>
+	 *
+	 * @param fromCity the starting city
+	 * @param toCity   the destination city
+	 * @param criteria the optimization criteria (shortest time, lowest cost, fewest
+	 *                 transfers)
+	 * @param K        the maximum number of top paths to return
+	 * @return a list of up to K {@link PathInfo} objects representing the best
+	 *         paths between the cities
+	 */
 
-        List<PathInfo> resultPaths = new ArrayList<>();
-        PriorityQueue<PathInfo> candidates = new PriorityQueue<>(Comparator.comparingInt(p -> getWeight(p, criteria)));
+	public List<PathInfo> findTopKPaths(String fromCity, String toCity, OptimizationCriteria criteria, int K) {
+		List<Node> startNodes = routeFinder.getStationsForCity(fromCity);
+		List<Node> endNodes = routeFinder.getStationsForCity(toCity);
 
-        
-        for (Node start : startNodes) {
-            for (Node end : endNodes) {
-                if (!start.equals(end)) {
-                    PathInfo shortest = routeFinder.dijkstraShortestPath(start, end, criteria);
-                    if (shortest != null) {
-                        candidates.add(shortest);
-                    }
-                }
-            }
-        }
+		List<PathInfo> resultPaths = new ArrayList<>();
+		PriorityQueue<PathInfo> candidates = new PriorityQueue<>(Comparator.comparingInt(p -> getWeight(p, criteria)));
 
-        if (candidates.isEmpty()) return resultPaths;
+		for (Node start : startNodes) {
+			for (Node end : endNodes) {
+				if (!start.equals(end)) {
+					PathInfo shortest = routeFinder.dijkstraShortestPath(start, end, criteria);
+					if (shortest != null) {
+						candidates.add(shortest);
+					}
+				}
+			}
+		}
 
-      
-        resultPaths.add(candidates.poll());
+		if (candidates.isEmpty())
+			return resultPaths;
 
-        
-        while (resultPaths.size() < K && !candidates.isEmpty()) {
-            PathInfo lastPath = resultPaths.get(resultPaths.size() - 1);
-            Path lastGraphPath = lastPath.getPath();
-            List<Node> nodePath = lastGraphPath.getNodePath();
+		resultPaths.add(candidates.poll());
 
-            for (int i = 0; i < nodePath.size() - 1; i++) {
-                Node spurNode = nodePath.get(i);
+		while (resultPaths.size() < K && !candidates.isEmpty()) {
+			PathInfo lastPath = resultPaths.get(resultPaths.size() - 1);
+			Path lastGraphPath = lastPath.getPath();
+			List<Node> nodePath = lastGraphPath.getNodePath();
 
-               
-                List<Edge> rootEdges = new ArrayList<>(lastGraphPath.getEdgePath().subList(0, i));
+			for (int i = 0; i < nodePath.size() - 1; i++) {
+				Node spurNode = nodePath.get(i);
 
-                
-                Set<Edge> removedEdges = new HashSet<>();
-                for (PathInfo p : resultPaths) {
-                    List<Edge> edgePath = p.getPath().getEdgePath();
-                    boolean matchesRoot = true;
-                    for (int j = 0; j < rootEdges.size(); j++) {
-                        if (!rootEdges.get(j).equals(edgePath.get(j))) {
-                            matchesRoot = false;
-                            break;
-                        }
-                    }
-                    if (matchesRoot && edgePath.size() > i) {
-                        Edge edgeToRemove = edgePath.get(i);
-                        removedEdges.add(edgeToRemove);
-                        edgeToRemove.setAttribute("disabled", true); // mark as disabled
-                    }
-                }
+				List<Edge> rootEdges = new ArrayList<>(lastGraphPath.getEdgePath().subList(0, i));
 
-               
-                Node targetNode = nodePath.get(nodePath.size() - 1);
-                PathInfo spurPathInfo = routeFinder.dijkstraShortestPath(spurNode, targetNode, criteria);
+				Set<Edge> removedEdges = new HashSet<>();
+				for (PathInfo p : resultPaths) {
+					List<Edge> edgePath = p.getPath().getEdgePath();
+					boolean matchesRoot = true;
+					for (int j = 0; j < rootEdges.size(); j++) {
+						if (!rootEdges.get(j).equals(edgePath.get(j))) {
+							matchesRoot = false;
+							break;
+						}
+					}
+					if (matchesRoot && edgePath.size() > i) {
+						Edge edgeToRemove = edgePath.get(i);
+						removedEdges.add(edgeToRemove);
+						edgeToRemove.setAttribute("disabled", true);
+					}
+				}
 
-                if (spurPathInfo != null) {
-                    
-                    Path combinedPath = new Path();
-                    combinedPath.setRoot(nodePath.get(0));
-                    for (Edge e : rootEdges) combinedPath.add(e);
-                    for (Edge e : spurPathInfo.getPath().getEdgePath()) combinedPath.add(e);
+				Node targetNode = nodePath.get(nodePath.size() - 1);
+				PathInfo spurPathInfo = routeFinder.dijkstraShortestPath(spurNode, targetNode, criteria);
 
-                   
-                    int totalTime = 0, totalCost = 0, totalTransfers = 0;
-                    for (Edge e : combinedPath.getEdgePath()) {
-                        totalTime += routeFinder.getEdgeWeight(e, OptimizationCriteria.SHORTEST_TIME);
-                        totalCost += routeFinder.getEdgeWeight(e, OptimizationCriteria.LOWEST_COST);
-                        totalTransfers += routeFinder.getEdgeWeight(e, OptimizationCriteria.FEWEST_TRANSFERS);
-                    }
+				if (spurPathInfo != null) {
 
-                    PathInfo candidate = new PathInfo(combinedPath, totalTime, totalCost, totalTransfers, totalTime);
-                    if (!candidates.contains(candidate) && !resultPaths.contains(candidate)) {
-                        candidates.add(candidate);
-                    }
-                }
+					Path combinedPath = new Path();
+					combinedPath.setRoot(nodePath.get(0));
+					for (Edge e : rootEdges)
+						combinedPath.add(e);
+					for (Edge e : spurPathInfo.getPath().getEdgePath())
+						combinedPath.add(e);
 
-                
-                for (Edge e : removedEdges) {
-                    e.removeAttribute("disabled");
-                }
-            }
+					int totalTime = 0, totalCost = 0, totalTransfers = 0;
+					for (Edge e : combinedPath.getEdgePath()) {
+						totalTime += routeFinder.getEdgeWeight(e, OptimizationCriteria.SHORTEST_TIME);
+						totalCost += routeFinder.getEdgeWeight(e, OptimizationCriteria.LOWEST_COST);
+						totalTransfers += routeFinder.getEdgeWeight(e, OptimizationCriteria.FEWEST_TRANSFERS);
+					}
 
-            if (!candidates.isEmpty()) {
-                resultPaths.add(candidates.poll());
-            } else {
-                break;
-            }
-        }
+					PathInfo candidate = new PathInfo(combinedPath, totalTime, totalCost, totalTransfers, totalTime);
+					if (!candidates.contains(candidate) && !resultPaths.contains(candidate)) {
+						candidates.add(candidate);
+					}
+				}
 
-        return resultPaths;
-    }
+				for (Edge e : removedEdges) {
+					e.removeAttribute("disabled");
+				}
+			}
 
-    private int getWeight(PathInfo path, OptimizationCriteria criteria) {
-        return switch (criteria) {
-            case SHORTEST_TIME -> path.getTotalTime();
-            case LOWEST_COST -> path.getTotalCost();
-            case FEWEST_TRANSFERS -> path.getTotalTransfers();
-        };
-    }
-    
-    
-    
+			if (!candidates.isEmpty()) {
+				resultPaths.add(candidates.poll());
+			} else {
+				break;
+			}
+		}
+
+		return resultPaths;
+	}
+
+	private int getWeight(PathInfo path, OptimizationCriteria criteria) {
+		return switch (criteria) {
+		case SHORTEST_TIME -> path.getTotalTime();
+		case LOWEST_COST -> path.getTotalCost();
+		case FEWEST_TRANSFERS -> path.getTotalTransfers();
+		};
+	}
 
 }

@@ -17,27 +17,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import util.RacunUtil;
 import java.io.IOException;
+
 /**
- * The startup frame for initializing the transport matrix and displaying sales statistics.
+ * The startup frame for initializing the transport matrix and displaying sales
+ * statistics.
  * 
  * <p>
- * This frame allows the user to input the number of rows and columns for the transport matrix, 
- * generate the transport data, and launch the main application window. It also displays 
- * the total number of tickets sold and the total revenue generated.
+ * This frame allows the user to input the number of rows and columns for the
+ * transport matrix, generate the transport data, and launch the main
+ * application window. It also displays the total number of tickets sold and the
+ * total revenue generated.
  * </p>
  * 
  * <p>
  * The frame contains:
  * <ul>
- *   <li>Text fields for entering the number of rows and columns of the transport matrix.</li>
- *   <li>A button to generate the transport matrix and launch the {@link MainFrame}.</li>
- *   <li>Labels showing the total tickets sold and total revenue.</li>
+ * <li>Text fields for entering the number of rows and columns of the transport
+ * matrix.</li>
+ * <li>A button to generate the transport matrix and launch the
+ * {@link MainFrame}.</li>
+ * <li>Labels showing the total tickets sold and total revenue.</li>
  * </ul>
  * </p>
  * 
  * <p>
- * The transport data is generated using TransportDataGenerator and parsed using 
- * TransportDataParser. Sales statistics are retrieved using  RacunUtil.
+ * The transport data is generated using TransportDataGenerator and parsed using
+ * TransportDataParser. Sales statistics are retrieved using RacunUtil.
  * </p>
  */
 
@@ -127,15 +132,19 @@ public class StartupFrame extends JFrame {
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				try {
-					int rows = Integer.parseInt(rowsField.getText());
-					int cols = Integer.parseInt(colsField.getText());
+					int rows = Integer.parseInt(rowsField.getText().trim());
+					int cols = Integer.parseInt(colsField.getText().trim());
+
+					if (rows <= 0 || cols <= 0) {
+						JOptionPane.showMessageDialog(StartupFrame.this,
+								"Broj redova i kolona mora biti pozitivan cijeli broj", "Greška pri unosu",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
 					TransportDataGenerator.setDimensions(rows, cols);
-
 					TransportDataGenerator.generateAndSaveData();
-
 					TransportDataGenerator.TransportData data = TransportDataParser.parse("transport_data.json");
 
 					dispose();
@@ -144,9 +153,13 @@ public class StartupFrame extends JFrame {
 				} catch (NumberFormatException ex) {
 					JOptionPane.showMessageDialog(StartupFrame.this, "Unesite validne pozitivne cijele brojeve",
 							"Greška pri unosu", JOptionPane.ERROR_MESSAGE);
+				} catch (IllegalArgumentException ex) {
+					JOptionPane.showMessageDialog(StartupFrame.this, ex.getMessage(), "Greška pri unosu dimenzija",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
+
 		buttonPanel.add(startButton);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
