@@ -1,4 +1,19 @@
 package model;
+/**
+ * Represents a segment of a route between two stations.
+ *
+ * <p>
+ * Each segment contains information about the departure and arrival stations,
+ * the type of transport (bus or train), departure and arrival times, duration,
+ * and price. Optional fields store the cities of the departure and arrival stations.
+ * </p>
+ *
+ * <p>
+ * The class provides constructors for creating a segment with or without initial values,
+ * as well as getters and setters for all fields. Utility methods are available to
+ * get formatted duration and price.
+ * </p>
+ */
 
 public class RouteSegment {
 	private String fromStation;

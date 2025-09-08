@@ -32,6 +32,34 @@ import java.io.IOException;
 
 import model.Racun;
 
+/**
+ * The main application window for route search and visualization.
+ * 
+ * <p>
+ * This frame allows users to select a starting city, destination city, and optimization criteria,
+ * then search for the best route. It displays route segments in a table, highlights the route
+ * in a transport graph and city graph, and supports purchasing tickets with receipt generation.
+ * </p>
+ * 
+ * <p>
+ * The frame contains:
+ * <ul>
+ *   <li>Combo boxes for selecting start and end cities and optimization criteria.</li>
+ *   <li>Buttons for finding the best route, showing additional routes, purchasing tickets, 
+ *       and displaying the transport or city graph.</li>
+ *   <li>A table displaying route segments with columns for departure, arrival, transport type, 
+ *       and price.</li>
+ *   <li>A label displaying the total travel time, cost, and number of transfers.</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * Route data is provided by RouteController and TransportDataGenerator.TransportData.
+ * The frame interacts with AdditionalRoutesFrame, link GraphFrame, and CityGraphFrame
+ * to show additional routes and visualize paths.
+ * </p>
+ */
+
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;

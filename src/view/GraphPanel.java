@@ -12,7 +12,14 @@ import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
 
 import graph.TransportGraph;
-
+/**
+ * A JPanel that visualizes a transport graph using GraphStream.
+ * 
+ * <p>
+ * The panel displays a MultiGraph representing a TransportGraph.
+ * It provides functionality to highlight paths and update the displayed graph dynamically.
+ * </p>
+ */
 public class GraphPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 

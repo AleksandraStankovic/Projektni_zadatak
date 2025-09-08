@@ -11,17 +11,41 @@ import java.util.*;
 
 public class YenKShortestPaths {
 
-    //private final MultiGraph graph;
+    
     private final RouteFinder routeFinder;
 
     public YenKShortestPaths(MultiGraph graph) {
-        //this.graph = graph;
+        
         this.routeFinder = new RouteFinder(graph);
     }
 
     /**
-     * Find top K shortest paths from fromCity to toCity
+     * Finds the top K paths between two cities according to the specified optimization criteria.
+     *
+     * <p>
+     * The method first retrieves all station nodes in the origin and destination cities.
+     * It then computes shortest paths between each pair of start and end nodes using Dijkstra's algorithm.
+     * </p>
+     *
+     * <p>
+     * After finding the initial shortest paths, the method uses a variation of Yen's algorithm
+     * to generate alternative paths by temporarily disabling edges in the previously found paths,
+     * and recomputing spur paths from intermediate nodes.
+     * </p>
+     *
+     * <p>
+     * For each candidate path, the total travel time, cost, and number of transfers are calculated
+     * based on edge weights. The top K paths are returned in order of increasing weight according
+     * to the given optimization criteria.
+     * </p>
+     *
+     * @param fromCity the starting city
+     * @param toCity the destination city
+     * @param criteria the optimization criteria (shortest time, lowest cost, fewest transfers)
+     * @param K the maximum number of top paths to return
+     * @return a list of up to K {@link PathInfo} objects representing the best paths between the cities
      */
+
     public List<PathInfo> findTopKPaths(String fromCity, String toCity, OptimizationCriteria criteria, int K) {
         List<Node> startNodes = routeFinder.getStationsForCity(fromCity);
         List<Node> endNodes = routeFinder.getStationsForCity(toCity);

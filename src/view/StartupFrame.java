@@ -17,6 +17,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import util.RacunUtil;
 import java.io.IOException;
+/**
+ * The startup frame for initializing the transport matrix and displaying sales statistics.
+ * 
+ * <p>
+ * This frame allows the user to input the number of rows and columns for the transport matrix, 
+ * generate the transport data, and launch the main application window. It also displays 
+ * the total number of tickets sold and the total revenue generated.
+ * </p>
+ * 
+ * <p>
+ * The frame contains:
+ * <ul>
+ *   <li>Text fields for entering the number of rows and columns of the transport matrix.</li>
+ *   <li>A button to generate the transport matrix and launch the {@link MainFrame}.</li>
+ *   <li>Labels showing the total tickets sold and total revenue.</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * The transport data is generated using TransportDataGenerator and parsed using 
+ * TransportDataParser. Sales statistics are retrieved using  RacunUtil.
+ * </p>
+ */
 
 public class StartupFrame extends JFrame {
 	private static final long serialVersionUID = 1L;

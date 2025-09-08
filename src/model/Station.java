@@ -4,14 +4,29 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,       // Use a type name for polymorphic deserialization
+    use = JsonTypeInfo.Id.NAME,      
     include = JsonTypeInfo.As.PROPERTY,
-    property = "type"                 // JSON property that indicates the type
+    property = "type"                 
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = BusStation.class, name = "autobus"),
     @JsonSubTypes.Type(value = TrainStation.class, name = "voz")
 })
+/**
+ * Abstract base class representing a transport station.
+ *
+ * <p>
+ * This class is designed for polymorphic JSON deserialization using Jackson.
+ * The {@code type} property in JSON indicates the concrete subclass:
+ * "autobus" for BusStation and "voz" for TrainStation.
+ * </p>
+ *
+ * <p>
+ * Each station stores the city it belongs to and a unique station code.
+ * Subclasses must implement the {@code getType()} method to indicate the type of station.
+ * </p>
+ */
+
 public abstract class Station {
     protected String city;
     protected String stationCode;

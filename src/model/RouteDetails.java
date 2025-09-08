@@ -3,6 +3,24 @@ package model;
 import org.graphstream.graph.Path;
 import java.util.ArrayList;
 import java.util.List;
+/**
+ * Represents detailed information about a route, including the path, 
+ * total travel time, cost, number of transfers, and individual route segments.
+ *
+ * <p>
+ * This class can be constructed either from a {@code PathInfo} object,
+ * extracting the path, aggregated statistics, and building a list of
+ * {@code RouteSegment} objects, or directly from a {@code Path} with
+ * zeroed statistics.
+ * </p>
+ *
+ * <p>
+ * It provides getters for the path, total time, total cost, total transfers,
+ * total weight, and the list of route segments. Utility methods are also
+ * included for formatted total time and cost, as well as a string
+ * representation of the route summary.
+ * </p>
+ */
 
 public class RouteDetails {
     private Path path;
@@ -58,13 +76,13 @@ public class RouteDetails {
 
     }
     
-    // Constructor for Path (legacy)
+
     public RouteDetails(Path path) {
         this.path = path;
         this.totalTime = 0;
         this.totalCost = 0;
         this.totalTransfers = 0;
-        this.segments = new ArrayList<>(); // Empty segments for now
+        this.segments = new ArrayList<>(); 
     }
     
    

@@ -18,6 +18,21 @@ import model.RouteSegment;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Creates a new frame displaying the top K routes between two cities.
+ * 
+ * <p>
+ * The frame shows a table with route segments including departure and arrival stations, 
+ * transport type, price, and a button to purchase a ticket. Each route is color-coded 
+ * for easier visualization. When the "Kupi kartu" button is clicked, a receipt is generated
+ * and saved, and a message dialog displays the ticket details.
+ * </p>
+ *
+ * @param fromCity the starting city of the route
+ * @param toCity the destination city of the route
+ * @param criteria the optimization criteria used to determine top routes
+ * @param controller the controller used to fetch route data
+ */
 
 
 
@@ -25,15 +40,14 @@ public class AdditionalRoutesFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 
-    
-	//private List<RouteDetails> routes; // store all routes in this frame
+
 	private Map<Integer, RouteDetails> rowToRouteMap = new HashMap<>();
 
 	private JTable table;
     
-	String[] columns = {"Ruta", "Polazak", "Dolazak", "Tip", "Cijena" , "Akcija"}; //dodati jos kolona za ukupnu cijenu i ukupno trajanje
+	String[] columns = {"Ruta", "Polazak", "Dolazak", "Tip", "Cijena" , "Akcija"}; 
     
-//ovdje treba bolje uraditi da se vidi sumarna ruta i cijena i da se samo tu nalazi dugme kupi 
+
 	
 	public AdditionalRoutesFrame(String fromCity, String toCity, OptimizationCriteria criteria,
             RouteController controller) {
@@ -51,7 +65,7 @@ JOptionPane.showMessageDialog(this, "Nema dostupnih ruta između odabranih grado
 table = new JTable(new DefaultTableModel(new Object[][]{}, new String[]{"Informacija", "Vrijednost"}));
 } else {
 
-// Count total rows
+
 int totalRows = routes.stream().mapToInt(r -> r.getSegments().size()).sum();
 Object[][] data = new Object[totalRows][columns.length];
 
@@ -76,17 +90,15 @@ private static final long serialVersionUID = 1L;
 
 @Override
 public boolean isCellEditable(int row, int column) {
-return column == 5; // Only "Akcija" column editable
+return column == 5; 
 }
 };
 
 table = new JTable(model);
 
-// Renderer for route colors + centered text
+
 DefaultTableCellRenderer routeRenderer = new DefaultTableCellRenderer() {
-/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 @Override
@@ -117,12 +129,12 @@ return c;
 }
 };
 
-// Apply renderer to all columns
+
 for (int i = 0; i < table.getColumnCount(); i++) {
 table.getColumnModel().getColumn(i).setCellRenderer(routeRenderer);
 }
 
-// Button column
+
 table.getColumn("Akcija").setCellRenderer(new ButtonRenderer());
 table.getColumn("Akcija").setCellEditor(new ButtonEditor(new JCheckBox(), table));
 
@@ -179,7 +191,7 @@ setContentPane(mainPanel);
 
 			button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					int row = table.getEditingRow(); // get current editing row
+					int row = table.getEditingRow(); 
 					if (row >= 0) {
 						
 						Object polazak = table.getValueAt(row, 0);
@@ -208,11 +220,11 @@ setContentPane(mainPanel);
 		public Object getCellEditorValue() {
 		    if (clicked) {
 		        int row = table.getEditingRow();
-		        RouteDetails route = rowToRouteMap.get(row); // get route for this row
+		        RouteDetails route = rowToRouteMap.get(row); 
 		        if (route != null) {
 		            Racun racun = new Racun(route);
 		            try {
-		                RacunUtil.sacuvajRacun(racun); // save to file
+		                RacunUtil.sacuvajRacun(racun); 
 		                JOptionPane.showMessageDialog(AdditionalRoutesFrame.this,
 		                        racun.generisiRacun(), "Karta kupljena", JOptionPane.INFORMATION_MESSAGE);
 		            } catch (IOException e) {
